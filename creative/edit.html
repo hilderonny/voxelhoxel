@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../shared/editor.css"/>
+    <script src="https://arrange.avorium.de/arrange-client.min.js"></script>
+    <script src="../shared/three.js"></script>
+    <script src="../shared/three.orbitcontrols.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../shared/editor.js"></script>
+    <script>
+      
+      // Palette by Arne http://androidarts.com/palette/Famicube.htm
+      const palette64 = [ '#000000', '#00177D', '#024ACA', '#0084FF', '#5BA8FF', '#98DCFF', '#9BA0EF', '#6264DC', '#3D34A5', '#211640', '#5A1991', '#6A31CA', '#A675FE', '#E2C9FF', '#FEC9ED', '#D59CFC', '#CC69E4', '#A328B3', '#871646', '#CF3C71', '#FF82CE', '#FFE9C5', '#F5B784', '#E18289', '#DA655E', '#823C3D', '#4F1507', '#E03C28', '#E2D7B5', '#C59782', '#AE6C37', '#5C3C0D', '#231712', '#AD4E1A', '#F68F37', '#FFE737', '#FFBB31', '#CC8F15', '#939717', '#B6C121', '#EEFFA9', '#BEEB71', '#8CD612', '#6AB417', '#376D03', '#172808', '#004E00', '#139D08', '#58D332', '#20B562', '#00604B', '#005280', '#0A98AC', '#25E2CD', '#BDFFCA', '#71A6A1', '#415D66', '#0D2030', '#151515', '#343434', '#7B7B7B', '#A8A8A8', '#D7D7D7', '#FFFFFF' ];
+      const dbName = 'voxelhoxel', collectionName = 'models';
+      var _id, model, arrangeClient;
+      
+      window.addEventListener('load', async function() {
+
+        arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
+
+        const renderer = Editor.init();
+        document.getElementById("rendering").appendChild(renderer);
+        
+        _id = getRequestParameters()._id;
+        if (_id) {
+          model = await arrangeClient.read(dbName, collectionName, _id);
+        } else {
+          model = {
+            colorpalette: [ '#000000', '#000080', '#008000', '#008080', '#800000', '#800080', '#808000', '#C0C0C0', '#808080', '#0000FF', '#00FF00', '#00FFFF', '#FF0000', '#FF00FF', '#FFFF00', '#FFFFFF' ],
+            pos: { x: 2, y: 4, z: 5 },
+            target: { x: 0, y: 0, z: 0 },
+            scene: { 0: { 0: { 0: 0 } } },
+            painted: {},
+            complete: false,
+            version: 1
+          };
+        };
+
+        document.getElementById('colorpalette').addEventListener('touchmove', function(e){e.stopPropagation()}, false);
+        document.getElementById('colorbar').addEventListener('touchmove', function(e){e.stopPropagation()}, false);
+
+        if (model.isPublished) document.getElementById('toolbar').style.display = 'none';
+        
+        Editor.loadModel(model);
+        createColorPalette();
+        createColorBar();
+        
+        setMode('add');
+        selectColor(0);
+        
+        Editor.start();
+        
+      });
+      
+      function createColorBar() {
+        const colorBar = document.getElementById('colorbar');
+        model.colorpalette.forEach(function(color, index) {
+          colorBar.innerHTML += '<label><input type="radio" name="color"' + (index === 0 ? ' checked' : '') + ' onchange="selectColor(' + index + ');" /><div style="background-color:' + color + '">' + index + '</div></label>';
+        });
+      }
+      
+      function createColorPalette() {
+        const colorPalette = document.getElementById('colorpalette');
+        palette64.forEach(function(color, index) {
+          colorPalette.innerHTML += '<label><input type="radio" name="colorpalette"' + (index === 0 ? ' checked' : '') + ' onchange="setPaletteColor(' + index + ');" /><div style="background-color:' + color + '"></div></label>';
+        });
+      }
+      
+      async function deleteModel() {
+        if (confirm('Soll das Modell wirklich gelöscht werden?')) {
+          if (_id) await arrangeClient.delete(dbName, collectionName, _id);
+          location.href = 'index.html';
+        }
+      }
+      
+      async function duplicate() {
+        model.thumbnail = Editor.makeScreenshot();
+        model.painted = {}; // In creative mode we do not store painted voxels in the database
+        model.version = model.version ? model.version + 1 : 1; // Increment version
+        delete model._id;
+        const result = await arrangeClient.create(dbName, collectionName, model);
+        _id = result._id;
+        model._id = _id;
+        alert('Dupliziert');
+      }
+      
+      async function save() {
+        model.thumbnail = Editor.makeScreenshot();
+        model.painted = {}; // In creative mode we do not store painted voxels in the database
+        model.version = model.version ? model.version + 1 : 1; // Increment version
+        if (_id) {
+          await arrangeClient.update(dbName, collectionName, _id, model);
+        } else {
+          const result = await arrangeClient.create(dbName, collectionName, model);
+          _id = result._id;
+          model._id = _id;
+        }
+        alert('Gespeichert');
+      }
+      
+      function selectColor(colorIndex) {
+        Editor.selectColor(colorIndex);
+        event.preventDefault();
+      }
+      
+      function setMode(mode) {
+        Editor.setMode(mode);
+        document.getElementById('colorbar').style.display = (['add', 'paint', 'play'].indexOf(mode) >= 0) ? 'flex': 'none';
+        Editor.forceResize();
+      }
+      
+      function setPaletteColor(paletteIndex) {
+        const color = palette64[paletteIndex];
+        document.getElementsByName('color').forEach(function(input) { 
+          if (!input.checked) return;
+          input.nextElementSibling.style.backgroundColor = color;
+        });
+        Editor.setCurrentColor(color);
+        event.preventDefault();
+      }
+      
+      function toggleColorPalette() {
+        document.getElementById('colorpalette').classList.toggle('visible');
+        Editor.forceResize();
+      }
+
+      async function publish() {
+        if (!confirm('Wirklich veröffentlichen? Das Model kann danach nicht mehr geändert oder gelöscht werden.')) return;
+        model.isPublished = true;
+        document.getElementById('toolbar').style.display = 'none';
+        await save();
+      }
+      
+    </script>
+  </head>
+  <body>
+    
+    <div id="rendering"></div>
+    
+    <div id="toolbar">
+      <!-- https://stackoverflow.com/a/17541916 -->
+      <img onclick="save();" src="../images/save.png"/>
+      <label>
+        <input type="radio" name="mode" onchange="setMode('play');"  />
+        <img src="../images/play.png"/>
+      </label>
+      <label>
+        <input type="radio" name="mode" onchange="setMode('paint');"  />
+        <img src="../images/colorize.png"/>
+      </label>
+      <label>
+        <input type="radio" name="mode" onchange="setMode('add');" checked />
+        <img src="../images/add.png"/>
+      </label>
+      <label>
+        <input type="radio" name="mode" onchange="setMode('remove');"  />
+        <img src="../images/remove.png"/>
+      </label>
+      <img onclick="toggleColorPalette();" src="../images/palette.png"/>
+      <div class="spacer"></div>
+      <img onclick="publish();" src="../images/publish.png"/>
+      <img onclick="duplicate();" src="../images/duplicate.png"/>
+      <img onclick="deleteModel();" src="../images/delete.png" />
+    </div>
+    
+    <div id="colorpalette"></div>
+    
+    <div id="colorbar"></div>
+    
+    <div id="toptoolbar">
+      <img onclick="location.href='index.html';" src="../images/back.png" />
+    </div>
+    
+  </body>
+</html>

@@ -1,0 +1,143 @@
+html { width: 100%; height: 100% }
+
+body { width: 100%; height: 100%; margin: 0; padding: 0; display: flex; flex-direction: column; font-family: sans-serif; overflow: hidden; }
+
+#rendering {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+#rendering .colorcounter {
+  display: flex;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  background-color: rgba(0,0,0,.5);
+  color: #fff;
+  padding: 5px 7px;
+  line-height: 20px;
+  border-radius: 14px;
+}
+
+#rendering canvas {
+  flex: 1;
+}
+
+#colorcounterblock {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  margin: 2px 4px 0px 0px;
+}
+
+#complete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+}
+
+#toolbar {
+  display: flex;
+  flex-direction: row;
+}
+
+#toolbar img {
+  cursor: pointer;
+  margin: 3px;
+}
+
+#toolbar .spacer {
+  flex: 1;
+}
+
+input[type=radio] {
+  display: none;
+}
+
+#toolbar input[type=radio]:checked + img {
+  outline: 3px solid #66f;
+  background-color: #ccf;
+}
+
+#toptoolbar {
+  position: fixed;
+  z-index: 1000;
+  left: 10px;
+  top: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+#toptoolbar img {
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+#colorbar {
+  flex-direction: row;
+  display: flex;
+  overflow: auto;
+}
+
+#colorbar div {
+  cursor: pointer;
+  display: flex;
+  width: 38px;
+  height: 38px;
+  margin: 2px;
+  border: 4px solid transparent;
+  border-radius: 24px;
+  opacity: .5;
+  text-align: center;
+  flex-direction: column;
+  line-height: 38px;
+  color: #fcfcfc;
+  text-shadow: -1px 0 #888, 0 1px 0px #888, 1px 0 #888, 0 -1px #888;
+  font-size: 24px;
+}
+
+#colorbar div:hover {
+  opacity: 1;
+}
+
+#colorbar input[type=radio]:checked + div {
+  opacity: 1;
+  border-color: #444;
+}
+
+#colorbar input[type=radio].complete + div span.checked {
+  display: initial;
+}
+
+#colorbar input[type=radio].complete + div span.unchecked {
+  display: none;
+}
+
+#colorbar label.invisible {
+  display: none;
+}
+
+#colorbar span.checked {
+  display: none;
+}
+
+#colorpalette {
+  flex-direction: row;
+  display: none;
+  overflow: auto;
+  background-color:#fafafa;
+}
+
+#colorpalette.visible {
+  display: flex;
+}
+
+#colorpalette div {
+  cursor: pointer;
+  display: flex;
+  width: 36px;
+  height: 42px;
+}
