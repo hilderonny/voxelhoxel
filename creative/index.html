@@ -10,6 +10,9 @@
       
       window.addEventListener('load', async function() {
 
+
+        // TODO: Login mit arrangeClient.login('voxelhoxel', 'username', 'password')
+
         const arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
         const list = document.querySelector('.list');
         const models = await arrangeClient.search('voxelhoxel', 'models', {}, '_id name thumbnail isPublished');
