@@ -21,12 +21,25 @@
 
   <iframe name="dummy" style="display: none"></iframe>
   <img id="back" onclick="goBack();" src="../images/back.png" />
+
   <form action="" method="post" target="dummy" id="listloginform" onsubmit="login();">
     <h1>Kreativmodus</h1>
-    <input type="text" placeholder="Name" name="username" />
-    <input type="password" placeholder="Passwort" name="password" />
+    <input type="text" required placeholder="Name" name="username" />
+    <input type="password" required placeholder="Passwort" name="password" />
     <input type="submit" value="Anmelden" />
     <div id="loginfailed">Die Anmeldung hat nicht geklappt. Bitte versuche es noch einmal.</div>
+    <p onclick="showRegistrationForm();">Neues Konto erstellen</p>
+  </form>
+
+  <form action="" method="post" target="dummy" id="listregisterform" onsubmit="register();">
+    <h1>Konto erstellen</h1>
+    <input type="text" required placeholder="Name" name="username" />
+    <input type="password" required placeholder="Passwort" name="password1" />
+    <input type="password" required placeholder="Passwort wiederholen" name="password2" />
+    <input type="submit" value="Registrieren" />
+    <div id="registrationfailed1">Der Benutzername ist leider schon vergeben. Bitte wähle einen anderen.</div>
+    <div id="registrationfailed2">Die Passwörter stimmen nicht überein. Bitte prüfe Deine Eingabe.</div>
+    <p onclick="location.reload();">Anmelden</p>
   </form>
 
   <div id="list" class="list"></div>
