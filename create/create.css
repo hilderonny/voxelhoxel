@@ -1,0 +1,9 @@
+form { display: flex; flex-direction: column; margin: auto; width: 300px; flex: 1; justify-content: center; }
+form h1 { text-align: center; text-transform: uppercase; color: #A37F81; }
+form input { border: 1px solid #A37F81; border-radius: 4px; font-size: 20px; padding: 4px 8px; margin: 8px 0; }
+form input[type="submit"] { background-color: #A37F81; border-width: 4px; border-color: #FFC9CD #564446 #564446 #FFC9CD; color:#fff; text-transform: uppercase; font-weight: bold; cursor: pointer; }
+form input[type="submit"]:active { border-color: #564446 #FFC9CD #FFC9CD #564446; background-color: #7A6063; }
+
+#loginfailed { display:none; color:#e00; padding: 4px 0; }
+#list, #listtoolbar, #toolbar, #rendering, #colorbar { display: none; }
+#back { position: fixed; z-index: 1000; left: 10px; top: 10px; cursor: pointer; }

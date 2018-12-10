@@ -73,7 +73,6 @@ input[type=radio] {
 
 #toptoolbar img {
   cursor: pointer;
-  image-rendering: pixelated;
 }
 
 #colorbar {

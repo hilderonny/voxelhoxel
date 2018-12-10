@@ -217,6 +217,7 @@ const Editor = (function() {
   return {
     
     init: function() {
+      objects = [];
       // Create scene
       scene = new THREE.Scene();
       scene.background = new THREE.Color( 0xA37F81 );
