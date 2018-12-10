@@ -117,7 +117,6 @@ function createColorPalette() {
 async function deleteModel() {
     if (confirm('Soll das Modell wirklich gelöscht werden?')) {
         if (_id) await arrangeClient.delete(dbName, collectionName, _id);
-        location.href = 'index.html';
         showList();
     }
 }
