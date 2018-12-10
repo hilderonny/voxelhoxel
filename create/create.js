@@ -55,6 +55,7 @@ function goBack() {
 
 async function showList() {
     model = null;
+    _id = null;
     const models = await arrangeClient.search('voxelhoxel', 'models', { _ownerId: user._id }, '_id name thumbnail isPublished');
     list.innerHTML = "";
     models.forEach(function (model) {
