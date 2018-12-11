@@ -243,12 +243,12 @@ const Editor = (function() {
       // Setup input handling
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
-      document.addEventListener('mousemove', onDocumentMouseMove, false);
-      document.addEventListener('mouseup', onDocumentMouseUp, false);
-      document.addEventListener('touchend', onDocumentTouchEnd, false);
-      document.addEventListener('mousedown', onDocumentMouseDown, false);
-      document.addEventListener('touchstart', onDocumentTouchStart, false);
-      document.addEventListener('touchmove', onDocumentTouchMove, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
+      renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
+      renderer.domElement.addEventListener('mouseup', onDocumentMouseUp, false);
+      renderer.domElement.addEventListener('touchend', onDocumentTouchEnd, false);
+      renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
+      renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
+      renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
       // Setup lights
       const pointLight = new THREE.PointLight( 0xffffff );
       pointLight.position.set(1,1,2);
