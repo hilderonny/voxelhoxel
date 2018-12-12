@@ -115,7 +115,7 @@ async function showModel(id) {
 
     const renderer = Editor.init();
     rendering.innerHTML = "";
-    rendering.appendChild(renderer);
+    rendering.appendChild(renderer.domElement);
 
     Editor.loadModel(model);
     createColorPalette();

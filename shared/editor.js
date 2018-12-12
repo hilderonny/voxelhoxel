@@ -33,9 +33,11 @@ const Editor = (function() {
   }
   
   function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
+    //requestAnimationFrame(animate);
+    renderer.animate(function() {
+      controls.update();
+      renderer.render(scene, camera);
+    });
   }
   
   function createTextTexture(text) {
@@ -259,7 +261,7 @@ const Editor = (function() {
       // Handle window resize
       window.addEventListener( 'resize', onWindowResize, false );
       // Return domElement so that the caller can put it into the DOM
-      return renderer.domElement;
+      return renderer;
     },
     
     forceResize: function() {

@@ -22,7 +22,7 @@
       window.addEventListener('load', async function() {
 
         const renderer = Editor.init();
-        document.getElementById("rendering").appendChild(renderer);
+        document.getElementById("rendering").appendChild(renderer.domElement);
         
         _id = getRequestParameters()._id;
         if (!_id) return alert('Geht nicht ohne _id!');
