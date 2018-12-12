@@ -46,6 +46,44 @@ class Scene {
         this.renderer.domElement.addEventListener('click', (function () { this.firstPersonControls.lock(); }).bind(this));
     }
 
+    addDemoParticles() {
+        var light = new THREE.PointLight(0xffffff);
+        light.position.set(0, 250, 0);
+        this.scene.add(light);
+
+        //var cubeGeometry = new THREE.CubeGeometry(1, 1, 1, 20, 20, 20);
+
+        var cubeGeometry = new THREE.Geometry();
+        var c = 20;
+        var f = 1 / c;
+        for (var z = 0; z < c; z++) {
+            for (var y = 0; y < c; y++) {
+                for (var x = 0; x < c; x++) {
+                    cubeGeometry.vertices.push(new THREE.Vector3(x * f, y * f, z * f));
+                }
+            }
+        }
+        var vsc = document.getElementById('vertexshader').textContent;
+        var fsc = document.getElementById('fragmentshader').textContent;
+        var shaderMaterial = new THREE.ShaderMaterial(
+            {
+                uniforms: {},
+                vertexShader: vsc,
+                fragmentShader: fsc,
+                transparent: true, alphaTest: 0.5,  // if having transparency issues, try including: alphaTest: 0.5, 
+                // blending: THREE.AdditiveBlending, depthTest: false,
+                // I guess you don't need to do a depth test if you are alpha blending?
+                // 
+            });
+
+        var particleCube = new THREE.ParticleSystem(cubeGeometry, shaderMaterial);
+        particleCube.position.set(-.5, -.5, -1);
+        particleCube.dynamic = true;
+        particleCube.sortParticles = true;
+        this.scene.add(particleCube);
+
+    }
+
     addVRControls() {
         this.vrControls = new VRControls(this.renderer);
         this.renderer.domElement.addEventListener('click', (function () { this.vrControls.enterVR(); }).bind(this));
