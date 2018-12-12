@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="manifest" href="../manifest.json" />
+	<link rel="stylesheet" href="vr.css" />
+	<script src="https://arrange.avorium.de/arrange-client.min.js"></script>
+	<script src="../shared/three.js"></script>
+	<script src="../shared/firstpersoncontrols.js"></script>
+	<script src="../shared/vrcontrols.js"></script>
+	<script src="../shared/voxelmodel.js"></script>
+	<script src="../shared/utils.js"></script>
+	<script src="scene.js"></script>
+	<script>
+
+		var scene;
+
+		_l(async function () {
+
+			scene = new Scene();
+			scene.attachTo(document.body);
+
+			scene.addDebugRoom();
+
+			if (await VRControls.isAvailable()) {
+				scene.addVRControls();
+			} else {
+				scene.addFirstPersonControls();
+			}
+
+			const arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
+			const modelsFromServer = await arrangeClient.search('voxelhoxel', 'models', {}, '_id');
+			console.log(modelsFromServer);
+
+			for (let i = 0; i < modelsFromServer.length; i++) {
+				const modelData = await arrangeClient.read('voxelhoxel', 'models', modelsFromServer[i]._id);
+				const voxelModel = new VoxelModel(modelData);
+				const object3D = voxelModel.object3D;
+				object3D.scale.multiplyScalar(.01);
+				object3D.position.set(i * .5, 0, -1);
+				scene.scene.add(object3D);
+				console.log(voxelModel.arrangeModel._id);
+			}
+
+		});
+
+	</script>
+</head>
+
+<body></body>
+
+</html>

@@ -2,8 +2,16 @@ function _c(tagName) {
   return document.createElement(tagName);
 }
 
+function _e(id) {
+  return document.getElementById(id);
+}
+
 function _g(selector) {
   return document.querySelector(selector);
+}
+
+function _l(func) {
+  window.addEventListener('load', func);
 }
 
 function getRequestParameters() {
