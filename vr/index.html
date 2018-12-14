@@ -61,7 +61,7 @@ void main()
 
 			scene.addDemoParticles();
 
-			const arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
+			const arrangeClient = new ArrangeClient('https://arrange.avorium.de/');
 			const modelsFromServer = await arrangeClient.search('voxelhoxel', 'models', {}, '_id');
 			console.log(modelsFromServer);
 

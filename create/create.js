@@ -212,7 +212,7 @@ async function publish() {
 
 window.addEventListener('load', async function () {
 
-    arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
+    arrangeClient = new ArrangeClient('https://arrange.avorium.de/');
 
     listLoginForm = document.getElementById('listloginform');
     listRegisterForm = document.getElementById('listregisterform');
