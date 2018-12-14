@@ -17,7 +17,7 @@
         localModels = await LocalDb.listModels();
 
         try {
-          const arrangeClient = await ArrangeClient().connect('wss://arrange.avorium.de:42001');
+          const arrangeClient = new ArrangeClient('https://arrange.avorium.de/');
           const modelsFromServer = await arrangeClient.search('voxelhoxel', 'models', { isPublished: true }, '_id version');
           // Save models in local database
           for (var i = 0; i < modelsFromServer.length; i++) {
