@@ -347,7 +347,7 @@ const Editor = (function () {
             objects.forEach(function (obj) {
                 const z = obj.position.z, y = obj.position.y, x = obj.position.x;
                 const isPainted = model.painted[z] && model.painted[z][y] && model.painted[z][y][x];
-                obj.isPainted = true;
+                if (isPainted) obj.isPainted = true;
                 obj.material = (!isPainted && isNumber) ? obj.numbersMaterial : obj.standardMaterial;
             });
         },
