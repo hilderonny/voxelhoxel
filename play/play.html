@@ -103,7 +103,7 @@
           });
         });
         model.colorpalette.forEach(function(color, index) {
-          colorBar.innerHTML += '<label' + (colorsLeft[index] ? '' : ' class="invisible"') + '><input type="radio" name="color" onchange="selectColor(' + index + ');" /><div style="background-color:' + color + '"><span class="unchecked">' + index + '</span><span class="checked">&#10004;</span></div></label>';
+          colorBar.innerHTML += '<label' + (colorsLeft[index] ? '' : ' class="invisible"') + '><input type="radio" name="color" onchange="selectColor(' + index + ');" /><div style="background-color:' + color + '"><span class="unchecked">' + index + '</span><img class="checked" src="../images/checkmark.png"/></div></label>';
         });
         checkAllColors();
       }
