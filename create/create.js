@@ -109,7 +109,7 @@ async function showModel(id) {
     list.style.display = 'none';
     listToolbar.style.display = 'none';
     rendering.style.display = 'flex';
-    toolbar.style.display = model.isPublished ? 'none' : 'flex';
+    toolbar.style.display = 'flex';
     colorpalette.classList.remove('visible');
     colorbar.style.display = 'flex';
 
@@ -154,6 +154,7 @@ async function duplicate() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
+    model.isPublished = false;
     delete model._id;
     const result = await arrangeClient.create(dbName, collectionName, model);
     _id = result._id;
@@ -161,12 +162,47 @@ async function duplicate() {
     alert('Dupliziert');
 }
 
+function isBlockHidden(x, y, z) {
+    const scene = model.scene;
+
+    if (scene[z - 1] === undefined || scene[z - 1][y] === undefined || scene[z - 1][y][x] === undefined) return false;
+    if (scene[z + 1] === undefined || scene[z + 1][y] === undefined || scene[z + 1][y][x] === undefined) return false;
+
+    if (scene[z][y - 1] === undefined || scene[z][y - 1][x] === undefined) return false;
+    if (scene[z][y + 1] === undefined || scene[z][y + 1][x] === undefined) return false;
+
+    if (scene[z][y][x - 1] === undefined) return false;
+    if (scene[z][y][x + 1] === undefined) return false;
+
+    return true;
+}
+
+function removeHiddenBlocks() {
+    // Find and remember hidden blocks
+    const hiddenBlocks = [];
+    Object.entries(model.scene).forEach(function (zEntry) {
+        const z = zEntry[0];
+        Object.entries(zEntry[1]).forEach(function (yEntry) {
+            const y = yEntry[0];
+            Object.entries(yEntry[1]).forEach(function (xEntry) {
+                const x = xEntry[0];
+                if (isBlockHidden(parseInt(x), parseInt(y), parseInt(z))) hiddenBlocks.push({ x: x, y: y, z: z });
+            });
+        });
+    });
+    // Process hidden blocks
+    hiddenBlocks.forEach(function (hiddenBlock) {
+        delete model.scene[hiddenBlock.z][hiddenBlock.y][hiddenBlock.x];
+    });
+}
+
 async function save() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
+    removeHiddenBlocks();
     if (_id) {
-        const result = await arrangeClient.update(dbName, collectionName, _id, model);
+        await arrangeClient.update(dbName, collectionName, _id, model);
     } else {
         const result = await arrangeClient.create(dbName, collectionName, model);
         _id = result._id;
@@ -202,9 +238,8 @@ function toggleColorPalette() {
 }
 
 async function publish() {
-    if (!confirm('Wirklich veröffentlichen? Das Model kann danach nicht mehr geändert oder gelöscht werden.')) return;
+    if (!confirm('Wirklich veröffentlichen?')) return;
     model.isPublished = true;
-    toolbar.style.display = 'none';
     await save();
 }
 
