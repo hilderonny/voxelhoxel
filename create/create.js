@@ -200,7 +200,6 @@ async function save() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
-    removeHiddenBlocks();
     if (_id) {
         await arrangeClient.update(dbName, collectionName, _id, model);
     } else {
@@ -239,6 +238,7 @@ function toggleColorPalette() {
 
 async function publish() {
     if (!confirm('Wirklich veröffentlichen?')) return;
+    removeHiddenBlocks();
     model.isPublished = true;
     await save();
 }
