@@ -9,6 +9,7 @@
 const Editor = (function () {
 
     var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting;
+    const black = new THREE.Color( 0x000000 );
 
     function addBox(pos, paletteNumber) {
         const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -264,11 +265,11 @@ const Editor = (function () {
             renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
             renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
             // Setup lights
-            const pointLight = new THREE.PointLight(0xffffff);
-            pointLight.position.set(1, 1, 2);
+            const pointLight = new THREE.PointLight(0xeeeeee);
+            pointLight.position.set(0, 0, 0);
             camera.add(pointLight);
             scene.add(camera); // Need to add camera to scene when it has childs attached
-            const ambientLight = new THREE.AmbientLight(0x444444);
+            const ambientLight = new THREE.AmbientLight(0x222222);
             scene.add(ambientLight);
             // Handle window resize
             window.addEventListener('resize', onWindowResize, false);
@@ -346,6 +347,16 @@ const Editor = (function () {
             objects.forEach(function (obj) {
                 if (obj.paletteNumber === currentColorIndex) {
                     obj.standardMaterial.color.set(color);
+                }
+            });
+        },
+
+        setCurrentColorEmissive: function (isEmissive) {
+            // For glow effect: https://stemkoski.github.io/Three.js/Simple-Glow.html
+            const currentColor = model.colorpalette[currentColorIndex];
+            objects.forEach(function (obj) {
+                if (obj.paletteNumber === currentColorIndex) {
+                    obj.standardMaterial.emissive.set(isEmissive ? currentColor : black);
                 }
             });
         },

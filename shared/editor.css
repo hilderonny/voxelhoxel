@@ -133,6 +133,20 @@ input[type=radio] {
   background-color:#fafafa;
 }
 
+#colorpalette label {
+    display: flex;
+    align-items: center;
+}
+
+#colorpalette label span {
+    padding-right: 10px;
+}
+
+#colorpalette input[type=checkbox] {
+    width: 32px;
+    height: 32px;
+}
+
 #colorpalette.visible {
   display: flex;
 }

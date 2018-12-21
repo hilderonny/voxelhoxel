@@ -137,7 +137,7 @@ function createColorBar() {
 }
 
 function createColorPalette() {
-    colorpalette.innerHTML = "";
+    colorpalette.innerHTML = '<label><input type="checkbox" onchange="toggleEmissive(this.checked);"><span>Leuchtend</span></label>';
     palette64.forEach(function (color, index) {
         colorpalette.innerHTML += '<label><input type="radio" name="colorpalette"' + (index === 0 ? ' checked' : '') + ' onchange="setPaletteColor(' + index + ');" /><div style="background-color:' + color + '"></div></label>';
     });
@@ -234,6 +234,10 @@ function setPaletteColor(paletteIndex) {
 function toggleColorPalette() {
     colorpalette.classList.toggle('visible');
     Editor.forceResize();
+}
+
+function toggleEmissive(isEmissive) {
+    Editor.setCurrentColorEmissive(isEmissive);
 }
 
 async function publish() {
