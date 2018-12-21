@@ -237,8 +237,8 @@ const Editor = (function () {
             controls.dampingFactor = 0.25;
             controls.rotateSpeed = 0.1;
             controls.screenSpacePanning = true; // For panning vertically
-            controls.minDistance = 1;
-            controls.maxDistance = 1000;
+            controls.minDistance = 5;
+            controls.maxDistance = 100;
             controls.keys = { LEFT: 65, UP: 87, RIGHT: 68, BOTTOM: 83 };
             // Add mouse hover template
             const rollOverGeo = new THREE.BoxBufferGeometry(1, 1, 1);
