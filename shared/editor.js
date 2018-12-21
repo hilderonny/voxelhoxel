@@ -32,6 +32,14 @@ const Editor = (function () {
         scene.add(mesh);
     }
 
+    // Orbit-Target stets auf den Voxel ausrichten, den man gerade anguckt, wenn man einen anguckt
+    function updateViewTarget() {
+        raycaster.setFromCamera(new THREE.Vector2(), camera);
+        const intersects = raycaster.intersectObjects(objects);
+        if (intersects.length < 1) return;
+        controls.target = intersects[0].point.clone();
+    }
+
     function animate() {
         //requestAnimationFrame(animate);
         renderer.animate(function () {
@@ -93,6 +101,7 @@ const Editor = (function () {
                 playPaintBox(intersect.object);
             }
         }
+        updateViewTarget();
         isMoving = false;
         isPainting = false;
         controls.enabled = true;
