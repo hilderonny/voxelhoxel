@@ -236,6 +236,7 @@ const Editor = (function () {
             controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
             controls.dampingFactor = 0.25;
             controls.rotateSpeed = 0.1;
+            controls.panSpeed = 0.1;
             controls.screenSpacePanning = true; // For panning vertically
             controls.minDistance = 5;
             controls.maxDistance = 100;
