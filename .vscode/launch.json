@@ -4,8 +4,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "DevServer",
-            "program": "${workspaceFolder}/devserver.js"
+            "name": "Debug",
+            "program": "${workspaceFolder}/server/index.js"
         }
     ]
 }
