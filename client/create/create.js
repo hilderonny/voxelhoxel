@@ -3,7 +3,7 @@
 const palette64 = ['#000000', '#00177D', '#024ACA', '#0084FF', '#5BA8FF', '#98DCFF', '#9BA0EF', '#6264DC', '#3D34A5', '#211640', '#5A1991', '#6A31CA', '#A675FE', '#E2C9FF', '#FEC9ED', '#D59CFC', '#CC69E4', '#A328B3', '#871646', '#CF3C71', '#FF82CE', '#FFE9C5', '#F5B784', '#E18289', '#DA655E', '#823C3D', '#4F1507', '#E03C28', '#E2D7B5', '#C59782', '#AE6C37', '#5C3C0D', '#231712', '#AD4E1A', '#F68F37', '#FFE737', '#FFBB31', '#CC8F15', '#939717', '#B6C121', '#EEFFA9', '#BEEB71', '#8CD612', '#6AB417', '#376D03', '#172808', '#004E00', '#139D08', '#58D332', '#20B562', '#00604B', '#005280', '#0A98AC', '#25E2CD', '#BDFFCA', '#71A6A1', '#415D66', '#0D2030', '#151515', '#343434', '#7B7B7B', '#A8A8A8', '#D7D7D7', '#FFFFFF'];
 const dbName = 'voxelhoxel', collectionName = 'models';
 
-var arrangeClient, listLoginForm, listRegisterForm, list, listToolbar, rendering, toolbar, colorpalette, colorbar, user, _id, model;
+var listLoginForm, listRegisterForm, list, listToolbar, rendering, toolbar, colorpalette, colorbar, user, _id, model;
 
 
 /******* LISTE **********/
@@ -13,7 +13,7 @@ async function login() {
     document.getElementById('loginfailed').style.display = 'none';
     const username = listLoginForm.querySelector('[name="username"]').value;
     const password = listLoginForm.querySelector('[name="password"]').value;
-    const loginResult = await arrangeClient.login('voxelhoxel', username, password);
+    const loginResult = await post('/api/login', undefined, { username: username, password: password });
     if (!loginResult._id) {
         document.getElementById('loginfailed').style.display = 'initial';
     } else {
@@ -34,7 +34,7 @@ async function register() {
         rf2.style.display = 'initial';
         return;
     }
-    const registerResult = await arrangeClient.register('voxelhoxel', username, password1);
+    const registerResult = await post('/api/register', undefined, { username: username, password: password });
     if (!registerResult._id) {
         rf1.style.display = 'initial';
     } else {
@@ -56,7 +56,7 @@ function goBack() {
 async function showList() {
     model = null;
     _id = null;
-    const models = await arrangeClient.search('voxelhoxel', 'models', { _ownerId: user._id }, '_id name thumbnail isPublished');
+    const models = await get('/api/myModels', user.token);
     list.innerHTML = "";
     models.forEach(function (model) {
         const el = document.createElement('div');
@@ -90,7 +90,7 @@ function showRegistrationForm() {
 async function showModel(id) {
     if (id) {
         _id = id;
-        model = await arrangeClient.read(dbName, collectionName, id);
+        model = await get('/api/model/' + id);
     } else {
         _id = null;
         model = {
@@ -145,7 +145,7 @@ function createColorPalette() {
 
 async function deleteModel() {
     if (confirm('Soll das Modell wirklich gelöscht werden?')) {
-        if (_id) await arrangeClient.delete(dbName, collectionName, _id);
+        if (_id) await del('/api/model/' + _id, user.token);
         showList();
     }
 }
@@ -156,7 +156,7 @@ async function duplicate() {
     model.version = model.version ? model.version + 1 : 1; // Increment version
     model.isPublished = false;
     delete model._id;
-    const result = await arrangeClient.create(dbName, collectionName, model);
+    const result = await post('/api/saveModel', user.token, model);
     _id = result._id;
     model._id = _id;
     alert('Dupliziert');
@@ -200,10 +200,8 @@ async function save() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
-    if (_id) {
-        await arrangeClient.update(dbName, collectionName, _id, model);
-    } else {
-        const result = await arrangeClient.create(dbName, collectionName, model);
+    const result = await post('/api/saveModel', user.token, model);
+    if (!_id) {
         _id = result._id;
         model._id = _id;
     }
@@ -250,8 +248,6 @@ async function publish() {
 /******* ALLGEMEIN **********/
 
 window.addEventListener('load', async function () {
-
-    arrangeClient = new ArrangeClient('https://arrangeplatform.com/');
 
     listLoginForm = document.getElementById('listloginform');
     listRegisterForm = document.getElementById('listregisterform');

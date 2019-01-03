@@ -1,4 +1,4 @@
-function request(mode, url, data) {
+function request(mode, url, token, data) {
     return new Promise(function(resolve) {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
@@ -8,6 +8,9 @@ function request(mode, url, data) {
             }
         };
         xmlhttp.open(mode, url);
+        if (token) {
+            xmlhttp.setRequestHeader('x-access-token', token);
+        }
         if (mode === 'POST') {
             xmlhttp.setRequestHeader('Content-Type', 'application/json');
             xmlhttp.send(JSON.stringify(data));
@@ -17,10 +20,14 @@ function request(mode, url, data) {
     });
 }
 
-function get(url) {
-    return request('GET', url);
+function get(url, token) {
+    return request('GET', url, token);
 }
 
-function post(url, data) {
-    return request('POST', url, data);
+function del(url, token) {
+    return request('DELETE', url, token);
+}
+
+function post(url, token, data) {
+    return request('POST', url, token, data);
 }

@@ -7,12 +7,12 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link rel="manifest" href="../manifest.json" />
 	<link rel="stylesheet" href="vr.css" />
-	<script src="https://arrange.avorium.de/arrange-client.min.js"></script>
 	<script src="../shared/three.js"></script>
 	<script src="../shared/firstpersoncontrols.js"></script>
 	<script src="../shared/vrcontrols.js"></script>
 	<script src="../shared/voxelmodel.js"></script>
 	<script src="../shared/utils.js"></script>
+    <script src="../shared/request.js"></script>
 	<script src="scene.js"></script>
 	<script type="x-shader/x-vertex" id="vertexshader">
 attribute vec3 customColor;
@@ -59,19 +59,18 @@ void main()
 				scene.addFirstPersonControls();
 			}
 
-			scene.addDemoParticles();
+			//scene.addDemoParticles();
 
-			const arrangeClient = new ArrangeClient('https://arrange.avorium.de/');
-			const modelsFromServer = await arrangeClient.search('voxelhoxel', 'models', {}, '_id');
+			const modelsFromServer = await get('/api/publishedModels');
 			console.log(modelsFromServer);
 
 			for (let i = 0; i < modelsFromServer.length; i++) {
-				const modelData = await arrangeClient.read('voxelhoxel', 'models', modelsFromServer[i]._id);
+				const modelData = await get('/api/model/' + modelsFromServer[i]._id);
 				const voxelModel = new VoxelModel(modelData);
 				const object3D = voxelModel.object3D;
 				object3D.scale.multiplyScalar(.01);
 				object3D.position.set(i * .5, 0, -1);
-				//scene.scene.add(object3D);
+				scene.scene.add(object3D);
 				console.log(voxelModel.arrangeModel._id);
 			}
 

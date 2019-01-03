@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="../shared/list.css" />
   <link rel="stylesheet" href="../shared/editor.css" />
   <link rel="stylesheet" href="create.css" />
-  <script src="https://arrangeplatform.com/arrange-client.min.js"></script>
   <script src="../shared/three.js"></script>
   <script src="../shared/three.orbitcontrols.js"></script>
   <script src="../shared/utils.js"></script>
   <script src="../shared/editor.js"></script>
+  <script src="../shared/request.js"></script>
   <script src="create.js"></script>
 </head>
 
@@ -22,7 +22,7 @@
   <iframe name="dummy" style="display: none"></iframe>
   <img id="back" onclick="goBack();" src="../images/back.png" />
 
-  <form action="" method="post" target="dummy" id="listloginform" onsubmit="login();">
+  <form action="" method="post" target="dummy" id="listloginform" onsubmit="login();return false">
     <h1>Kreativmodus</h1>
     <input type="text" required placeholder="Name" name="username" />
     <input type="password" required placeholder="Passwort" name="password" />
@@ -31,7 +31,7 @@
     <p onclick="showRegistrationForm();" style="display:none">Neues Konto erstellen</p>
   </form>
 
-  <form action="" method="post" target="dummy" id="listregisterform" onsubmit="register();">
+  <form action="" method="post" target="dummy" id="listregisterform" onsubmit="register();return false">
     <h1>Konto erstellen</h1>
     <input type="text" required placeholder="Name" name="username" />
     <input type="password" required placeholder="Passwort" name="password1" />
