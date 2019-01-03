@@ -13,8 +13,8 @@
         .list div span.new { display: block; position:absolute; top:0; right: 0; color: #fff; background-color: #0be; padding: 4px; border-radius: 0 8px; text-transform: uppercase; font-weight: bold; font-size: 18px; }
         .list div span.complete { display: block; position:absolute; top:0; left: 0; color: #fff; background-color: #0c0; padding: 4px 12px; border-radius: 8px 0; text-transform: uppercase; font-weight: bold; font-size: 18px; }
     </style>
-    <script src="https://arrangeplatform.com/arrange-client.min.js"></script>
-    <script src="../shared/localdb.js?v=201812152015"></script>
+    <script src="../shared/request.js?v=201901032133"></script>
+    <script src="../shared/localdb.js?v=201901032133"></script>
     <script>
       
       var localModels;
@@ -24,20 +24,19 @@
         localModels = await LocalDb.listModels();
 
         try {
-          const arrangeClient = new ArrangeClient('https://arrangeplatform.com/');
-          const modelsFromServer = await arrangeClient.search('voxelhoxel', 'models', { isPublished: true }, '_id version');
+          const modelsFromServer = await get('/api/publishedModels');
           // Save models in local database
           for (var i = 0; i < modelsFromServer.length; i++) {
             const model = modelsFromServer[i];
             const localModelIndex = localModels.findIndex(function(m) { return m._id === model._id });
             if (localModelIndex < 0) {
-              const modelFromServer = await arrangeClient.read('voxelhoxel', 'models', model._id);
+              const modelFromServer = await get('/api/model/' + model._id);
               LocalDb.saveModel(modelFromServer);
               localModels.push(modelFromServer);
             } else {
               const localModel = localModels[localModelIndex];
               if (Object.keys(localModel.painted).length < 1 && (!localModel.version || model.version > localModel.version)) {
-                const modelFromServer = await arrangeClient.read('voxelhoxel', 'models', model._id);
+                const modelFromServer = await get('/api/model/' + model._id);
                 LocalDb.saveModel(modelFromServer);
                 localModels[localModelIndex] = modelFromServer;
               }
