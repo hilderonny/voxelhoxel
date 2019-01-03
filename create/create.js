@@ -251,7 +251,7 @@ async function publish() {
 
 window.addEventListener('load', async function () {
 
-    arrangeClient = new ArrangeClient('https://arrange.avorium.de/');
+    arrangeClient = new ArrangeClient('https://arrangeplatform.com/');
 
     listLoginForm = document.getElementById('listloginform');
     listRegisterForm = document.getElementById('listregisterform');
