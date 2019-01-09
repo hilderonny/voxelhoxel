@@ -19,11 +19,13 @@ public class MainActivity extends AppCompatActivity {
         WebView.setWebContentsDebuggingEnabled(true);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        webView.loadUrl("https://voxelhoxel.de/play/index.html");
+        //webView.loadUrl("https://voxelhoxel.de/play/index.html");
+        webView.loadUrl("file:///android_asset/index.html");
     }
 }
