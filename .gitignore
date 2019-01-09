@@ -1,1 +1,3 @@
 node_modules
+cordova/platforms
+cordova/plugins
