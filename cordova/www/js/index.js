@@ -1,21 +1,56 @@
+
+var localModels;
+
+document.addEventListener('deviceready', async function () {
+
+    localModels = await LocalDb.listModels();
+
+    try {
+        const modelsFromServer = await get('https://www.voxelhoxel.de/api/publishedModels');
+        // Save models in local database
+        for (var i = 0; i < modelsFromServer.length; i++) {
+            const model = modelsFromServer[i];
+            const localModelIndex = localModels.findIndex(function (m) { return m._id === model._id });
+            if (localModelIndex < 0) {
+                const modelFromServer = await get('https://www.voxelhoxel.de/api/model/' + model._id);
+                LocalDb.saveModel(modelFromServer);
+                localModels.push(modelFromServer);
+            } else {
+                const localModel = localModels[localModelIndex];
+                if (Object.keys(localModel.painted).length < 1 && (!localModel.version || model.version > localModel.version)) {
+                    const modelFromServer = await get('https://www.voxelhoxel.de/api/model/' + model._id);
+                    LocalDb.saveModel(modelFromServer);
+                    localModels[localModelIndex] = modelFromServer;
+                }
+            }
+        }
+    } catch (ex) {
+        console.log('We are offline because ', ex);
+    }
+
+    const list = document.querySelector('.list');
+    localModels.sort(function (a, b) {
+        if (a.complete && !b.complete) return 1;
+        if (!a.complete && b.complete) return -1;
+        return 0;
+    });
+    localModels.forEach(function (model) {
+        const el = document.createElement('div');
+        if (Object.keys(model.painted).length < 1) {
+            el.innerHTML = '<img src="' + model.thumbnail + '" style="filter:grayscale(100%);"/><span class="new">Neu</span>';
+        } else {
+            el.innerHTML = '<img src="' + model.thumbnail + '"/>' + (model.complete ? '<span class="complete">&#10004;</span>' : '');
+        }
+        el.addEventListener('click', function () {
+            location.href = 'play.html?_id=' + model._id;
+        });
+        list.appendChild(el);
+    });
+
+});
+
+
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 var app = {
     // Application Constructor
     initialize: function() {
@@ -44,3 +79,4 @@ var app = {
 };
 
 app.initialize();
+*/
