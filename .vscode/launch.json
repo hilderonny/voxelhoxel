@@ -5,7 +5,7 @@
             "type": "node",
             "request": "launch",
             "env": { 
-                "DBURL": "arrange.avorium.de:27017/voxelhoxel"
+                "DBURL": "127.0.0.1:27017/voxelhoxel"
             },
             "name": "Debug",
             "program": "${workspaceFolder}/server/index.js"

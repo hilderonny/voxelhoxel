@@ -4,6 +4,13 @@ This is a small casual voxel game located at https://www.voxelhoxel.de.
 ![Screenshots](presentation.jpg)
 *This awesome screenshot was made with https://pixeden.com and https://photopea.com*
 
+## Releases
+
+|Version|Content|
+|---|---|
+|1.0.1|Uses arrange as server library, sources moved to gitlab|
+|1.0.0|Version with included web server and sources on github|
+
 ## Installation on own server
 
 To run this game on your own server, you need to setup a NodeJS / MongoDB environment. On my server I use a combination of the following parts (as of January 2019):
@@ -45,10 +52,10 @@ sudo service mongod start
 Download the sources and install needed packages.
 
 ```sh
-mkdir -p /github/hilderonny
-cd /github/hilderonny
-git pull https://github.com/hilderonny/voxelhoxel.git
-cd /github/hilderonny/voxelhoxel
+mkdir -p /gitlab/hilderonny
+cd /gitlab/hilderonny
+git pull https://gitlab.com/hilderonny/voxelhoxel.git
+cd /gitlab/hilderonny/voxelhoxel
 npm install
 ```
 
@@ -62,8 +69,8 @@ WantedBy=multi-user.target
 Description=voxelhoxel.de
 [Service]
 Environment=PORT=62000
-ExecStart=/usr/bin/node /github/hilderonny/voxelhoxel/server/index.js
-WorkingDirectory=/github/hilderonny/voxelhoxel
+ExecStart=/usr/bin/node /gitlab/hilderonny/voxelhoxel/server/index.js
+WorkingDirectory=/gitlab/hilderonny/voxelhoxel
 Restart=always
 RestartSec=10
 StandardOutput=syslog

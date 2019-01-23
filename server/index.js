@@ -1,21 +1,12 @@
 const api = require('./api');
-const bodyParser = require('body-parser');
-const compression = require('compression');
-const cors = require('cors');
+const arrange = require('@hilderonny/arrange');
 const express = require('express');
-const http = require('http');
 
-const app = express();
-app.use(compression());
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/../client'));
-app.use('/api', api);
-
-const port = process.env.PORT || 8080;
-
-const server = http.createServer(app);
-server.listen(port, function () {
-    console.log('Server running at port ' + port);
-});
+const server = new arrange.Server(
+    process.env.PORT || 8080, 
+    process.env.DBURL || '127.0.0.1:27017/voxelhoxel',
+    process.env.SECRET || 'sachichnich'
+);
+server.app.use(express.static(__dirname + '/../client'));
+server.app.use('/api/voxelhoxel', api(server));
+server.start();

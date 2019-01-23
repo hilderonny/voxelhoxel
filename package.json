@@ -1,25 +1,20 @@
 {
   "name": "voxelhoxel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Voxelhoxel",
   "main": "server/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hilderonny/voxelhoxel.git"
+    "url": "git+https://gitlab.com/hilderonny/voxelhoxel.git"
   },
   "author": "Ronny Hildebrandt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hilderonny/voxelhoxel/issues"
+    "url": "https://gitlab.com/hilderonny/voxelhoxel/issues"
   },
-  "homepage": "https://github.com/hilderonny/voxelhoxel#readme",
+  "homepage": "https://gitlab.com/hilderonny/voxelhoxel#readme",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
-    "compression": "^1.7.3",
-    "cors": "^2.8.5",
-    "express": "^4.16.4",
-    "jsonwebtoken": "^8.4.0",
-    "monk": "^6.0.6"
+    "@hilderonny/arrange": "^1.0.3",
+    "express": "^4.16.4"
   }
 }
