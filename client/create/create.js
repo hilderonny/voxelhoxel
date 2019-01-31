@@ -56,9 +56,10 @@ function goBack() {
 async function showList() {
     model = null;
     _id = null;
-    const models = await get('/api/voxelhoxel/myModels', user.token);
+    const modelids = await post('/api/arrange/list/models', user.token);
     list.innerHTML = "";
-    models.forEach(function (model) {
+    modelids.forEach(async function (modelid) {
+        const model = await post('/api/arrange/details/models/' + modelid, user.token, { thumbnail: true, isPublished: true });
         const el = document.createElement('div');
         if (model.isPublished) {
             el.innerHTML = '<img src="' + model.thumbnail + '" /><span class="published">Veröffentlicht</span>';
@@ -66,7 +67,7 @@ async function showList() {
             el.innerHTML = '<img src="' + model.thumbnail + '"/>';
         }
         el.addEventListener('click', function () {
-            showModel(model._id);
+            showModel(modelid);
         });
         list.appendChild(el);
     });
@@ -90,7 +91,7 @@ function showRegistrationForm() {
 async function showModel(id) {
     if (id) {
         _id = id;
-        model = await get('/api/voxelhoxel/model/' + id);
+        model = await post('/api/arrange/details/models/' + id, user.token);
     } else {
         _id = null;
         model = {
@@ -144,10 +145,10 @@ function createColorPalette() {
 }
 
 async function deleteModel() {
-    if (confirm('Soll das Modell wirklich gelöscht werden?')) {
-        if (_id) await del('/api/voxelhoxel/model/' + _id, user.token);
-        showList();
-    }
+    // if (confirm('Soll das Modell wirklich gelöscht werden?')) {
+    //     if (_id) await del('/api/voxelhoxel/model/' + _id, user.token);
+    //     showList();
+    // }
 }
 
 async function duplicate() {
@@ -156,7 +157,7 @@ async function duplicate() {
     model.version = model.version ? model.version + 1 : 1; // Increment version
     model.isPublished = false;
     delete model._id;
-    const result = await post('/api/voxelhoxel/saveModel', user.token, model);
+    const result = await post('/api/arrange/save/models', user.token, model);
     _id = result._id;
     model._id = _id;
     alert('Dupliziert');
@@ -200,7 +201,7 @@ async function save() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
-    const result = await post('/api/voxelhoxel/saveModel', user.token, model);
+    const result = await post('/api/arrange/save/models', user.token, model);
     if (!_id) {
         _id = result._id;
         model._id = _id;
