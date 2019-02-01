@@ -24,20 +24,19 @@
         localModels = await LocalDb.listModels();
 
         try {
-          const modelsFromServer = await get('/api/voxelhoxel/publishedModels');
-          console.log(modelsFromServer);
+          const modelIdsFromServer = await post('/api/arrange/list/models');
           // Save models in local database
-          for (var i = 0; i < modelsFromServer.length; i++) {
-            const model = modelsFromServer[i];
-            const localModelIndex = localModels.findIndex(function(m) { return m._id === model._id });
+          for (var i = 0; i < modelIdsFromServer.length; i++) {
+            const modelId = modelIdsFromServer[i];
+            const localModelIndex = localModels.findIndex(function(m) { return m._id === modelId });
             if (localModelIndex < 0) {
-              const modelFromServer = await get('/api/voxelhoxel/publishedModel/' + model._id);
+              const modelFromServer = await post('/api/arrange/details/models/' + modelId);
               LocalDb.saveModel(modelFromServer);
               localModels.push(modelFromServer);
             } else {
               const localModel = localModels[localModelIndex];
-              if (Object.keys(localModel.painted).length < 1 && (!localModel.version || model.version > localModel.version)) {
-                const modelFromServer = await get('/api/voxelhoxel/publishedModel/' + model._id);
+              if (Object.keys(localModel.painted).length < 1) {
+                const modelFromServer = await post('/api/arrange/details/models/' + modelId);
                 LocalDb.saveModel(modelFromServer);
                 localModels[localModelIndex] = modelFromServer;
               }

@@ -59,9 +59,9 @@ async function showList() {
     const modelids = await post('/api/arrange/list/models', user.token);
     list.innerHTML = "";
     modelids.forEach(async function (modelid) {
-        const model = await post('/api/arrange/details/models/' + modelid, user.token, { thumbnail: true, isPublished: true });
+        const model = await post('/api/arrange/details/models/' + modelid, user.token, { thumbnail: true, _publiclyreadable: true });
         const el = document.createElement('div');
-        if (model.isPublished) {
+        if (model._publiclyreadable) {
             el.innerHTML = '<img src="' + model.thumbnail + '" /><span class="published">Veröffentlicht</span>';
         } else {
             el.innerHTML = '<img src="' + model.thumbnail + '"/>';
@@ -155,7 +155,6 @@ async function duplicate() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
-    model.isPublished = false;
     delete model._id;
     const result = await post('/api/arrange/save/models', user.token, model);
     _id = result._id;
@@ -242,7 +241,7 @@ function toggleEmissive(isEmissive) {
 async function publish() {
     if (!confirm('Wirklich veröffentlichen?')) return;
     removeHiddenBlocks();
-    model.isPublished = true;
+    await post('/api/arrange/setpubliclyreadable/models/' + model._id + '/true', user.token);
     await save();
 }
 

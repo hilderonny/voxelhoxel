@@ -3,7 +3,7 @@ function request(mode, url, token, data) {
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4) {
-                const result = JSON.parse(this.responseText);
+                const result = this.responseText ? JSON.parse(this.responseText) : undefined;
                 resolve(result);
             }
         };
@@ -11,7 +11,7 @@ function request(mode, url, token, data) {
         if (token) {
             xmlhttp.setRequestHeader('x-access-token', token);
         }
-        if (mode === 'POST') {
+        if (mode === 'POST' && data) {
             xmlhttp.setRequestHeader('Content-Type', 'application/json');
             xmlhttp.send(JSON.stringify(data));
         } else {

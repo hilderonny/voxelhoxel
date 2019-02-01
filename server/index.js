@@ -1,4 +1,3 @@
-const api = require('./api');
 const arrange = require('@hilderonny/arrange');
 const express = require('express');
 
@@ -8,5 +7,4 @@ const server = new arrange.Server(
     process.env.SECRET || 'sachichnich'
 );
 server.app.use(express.static(__dirname + '/../client'));
-server.app.use('/api/voxelhoxel', api(server));
 server.start();
