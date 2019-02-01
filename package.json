@@ -14,7 +14,7 @@
   },
   "homepage": "https://gitlab.com/hilderonny/voxelhoxel#readme",
   "dependencies": {
-    "@hilderonny/arrange": "^1.1.2",
+    "@hilderonny/arrange": "^1.2.0",
     "express": "^4.16.4"
   }
 }

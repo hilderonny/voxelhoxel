@@ -145,10 +145,10 @@ function createColorPalette() {
 }
 
 async function deleteModel() {
-    // if (confirm('Soll das Modell wirklich gelöscht werden?')) {
-    //     if (_id) await del('/api/voxelhoxel/model/' + _id, user.token);
-    //     showList();
-    // }
+    if (confirm('Soll das Modell wirklich gelöscht werden?')) {
+        if (_id) await del('/api/arrange/delete/models/' + _id, user.token);
+        showList();
+    }
 }
 
 async function duplicate() {
