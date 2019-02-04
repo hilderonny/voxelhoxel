@@ -1,74 +1,135 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="../manifest.json"/>
-    <style>
-        body { font-family: sans-serif; }
-        .list { text-align: center; background-color: #fcfcfc; padding-top: 60px; }
-        .list div { cursor: pointer; display: inline-block; margin: 8px; padding: 0 0 4px 0; border-radius: 8px; box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.8); background-color: #eee; position: relative; }
-        .list div img { border-radius: 8px; }
-        .list div span.new { display: block; position:absolute; top:0; right: 0; color: #fff; background-color: #0be; padding: 4px; border-radius: 0 8px; text-transform: uppercase; font-weight: bold; font-size: 18px; }
-        .list div span.complete { display: block; position:absolute; top:0; left: 0; color: #fff; background-color: #0c0; padding: 4px 12px; border-radius: 8px 0; text-transform: uppercase; font-weight: bold; font-size: 18px; }
-    </style>
-    <script src="../shared/request.js"></script>
-    <script src="../shared/localdb.js?v=201901032133"></script>
-    <script>
-      
-      var localModels;
-      
-      window.addEventListener('load', async function() {
-        
-        localModels = await LocalDb.listModels();
 
-        try {
-          const modelIdsFromServer = await post('/api/arrange/list/models');
-          // Save models in local database
-          for (var i = 0; i < modelIdsFromServer.length; i++) {
-            const modelId = modelIdsFromServer[i];
-            const localModelIndex = localModels.findIndex(function(m) { return m._id === modelId });
-            if (localModelIndex < 0) {
-              const modelFromServer = await post('/api/arrange/details/models/' + modelId);
-              LocalDb.saveModel(modelFromServer);
-              localModels.push(modelFromServer);
-            } else {
-              const localModel = localModels[localModelIndex];
-              if (Object.keys(localModel.painted).length < 1) {
-                const modelFromServer = await post('/api/arrange/details/models/' + modelId);
-                LocalDb.saveModel(modelFromServer);
-                localModels[localModelIndex] = modelFromServer;
-              }
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="../manifest.json" />
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .list {
+      text-align: center;
+      background-color: #fcfcfc;
+      padding-top: 60px;
+    }
+
+    .list div {
+      cursor: pointer;
+      display: inline-block;
+      margin: 8px;
+      padding: 0 0 4px 0;
+      border-radius: 8px;
+      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.8);
+      background-color: #eee;
+      position: relative;
+    }
+
+    .list div img {
+      border-radius: 8px;
+    }
+
+    .list div span.new {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: #fff;
+      background-color: #0be;
+      padding: 4px;
+      border-radius: 0 8px;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .list div span.complete {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #fff;
+      background-color: #0c0;
+      padding: 4px 12px;
+      border-radius: 8px 0;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+  <script src="/arrange/arrange.js"></script>
+  <script src="../shared/localdb.js?v=201901032133"></script>
+  <script>
+
+    var localModels;
+
+    let arrange = Arrange();
+
+    window.addEventListener('load', async function () {
+
+      localModels = await LocalDb.listModels();
+      const lockedLocalModelIds = localModels.filter(function(model) {
+        return Object.keys(model.painted).length > 0;
+      }).map(function(model) {
+        return model._id;
+      });
+
+      try {
+        const query = {
+          query: { _id: { $nin: lockedLocalModelIds } },
+          result: { version: true }
+        };
+        const modelsFromServer = await arrange.list('models', query);
+        // Save models in local database
+        for (let i = 0; i < modelsFromServer.length; i++) {
+          const modelFromServer = modelsFromServer[i];
+          const modelId = modelFromServer._id;
+          const localModelIndex = localModels.findIndex(function (m) { return m._id === modelId });
+          if (localModelIndex < 0) {
+            const completeModel = await arrange.details('models', modelId);
+            LocalDb.saveModel(completeModel);
+            localModels.push(completeModel);
+          } else {
+            const localModel = localModels[localModelIndex];
+            if (Object.keys(localModel.painted).length < 1 && localModel.version !== modelFromServer.version) {
+              const completeModel = await arrange.details('models', modelId);
+              LocalDb.saveModel(completeModel);
+              localModels[localModelIndex] = completeModel;
             }
           }
-        } catch(ex) {
-          console.log('We are offline because ', ex);
         }
-        
-        const list = document.querySelector('.list');
-        localModels.sort(function(a, b) { 
-          if (a.complete && !b.complete) return 1;
-          if (!a.complete && b.complete) return -1;
-          return 0;
-        });
-        localModels.forEach(function(model) {
-          const el = document.createElement('div');
-          if (Object.keys(model.painted).length < 1) {
-            el.innerHTML = '<img src="' + model.thumbnail + '" style="filter:grayscale(100%);"/><span class="new">Neu</span>';
-          } else {
-            el.innerHTML = '<img src="' + model.thumbnail + '"/>' + (model.complete ? '<span class="complete">&#10004;</span>' : '');
-          }
-          el.addEventListener('click', function() {
-            location.href = 'play.html?_id=' + model._id;
-          });
-          list.appendChild(el);
-        });
-        
+      } catch (ex) {
+        console.log('We are offline because ', ex);
+      }
+
+      const list = document.querySelector('.list');
+      localModels.sort(function (a, b) {
+        if (a.complete && !b.complete) return 1;
+        if (!a.complete && b.complete) return -1;
+        return 0;
       });
-    </script>
-  </head>
-  <body>
-    <div class="list"></div>
-  </body>
+      localModels.forEach(function (model) {
+        const el = document.createElement('div');
+        if (Object.keys(model.painted).length < 1) {
+          el.innerHTML = '<img src="' + model.thumbnail + '" style="filter:grayscale(100%);"/><span class="new">Neu</span>';
+        } else {
+          el.innerHTML = '<img src="' + model.thumbnail + '"/>' + (model.complete ? '<span class="complete">&#10004;</span>' : '');
+        }
+        el.addEventListener('click', function () {
+          location.href = 'play.html?_id=' + model._id;
+        });
+        list.appendChild(el);
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+  <div class="list"></div>
+</body>
+
 </html>

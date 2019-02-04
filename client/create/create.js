@@ -3,7 +3,9 @@
 const palette64 = ['#000000', '#00177D', '#024ACA', '#0084FF', '#5BA8FF', '#98DCFF', '#9BA0EF', '#6264DC', '#3D34A5', '#211640', '#5A1991', '#6A31CA', '#A675FE', '#E2C9FF', '#FEC9ED', '#D59CFC', '#CC69E4', '#A328B3', '#871646', '#CF3C71', '#FF82CE', '#FFE9C5', '#F5B784', '#E18289', '#DA655E', '#823C3D', '#4F1507', '#E03C28', '#E2D7B5', '#C59782', '#AE6C37', '#5C3C0D', '#231712', '#AD4E1A', '#F68F37', '#FFE737', '#FFBB31', '#CC8F15', '#939717', '#B6C121', '#EEFFA9', '#BEEB71', '#8CD612', '#6AB417', '#376D03', '#172808', '#004E00', '#139D08', '#58D332', '#20B562', '#00604B', '#005280', '#0A98AC', '#25E2CD', '#BDFFCA', '#71A6A1', '#415D66', '#0D2030', '#151515', '#343434', '#7B7B7B', '#A8A8A8', '#D7D7D7', '#FFFFFF'];
 const dbName = 'voxelhoxel', collectionName = 'models';
 
-var listLoginForm, listRegisterForm, list, listToolbar, rendering, toolbar, colorpalette, colorbar, user, _id, model;
+const arrange = Arrange();
+
+var listLoginForm, listRegisterForm, list, listToolbar, rendering, toolbar, colorpalette, colorbar, _id, model, loggedin = false;
 
 
 /******* LISTE **********/
@@ -13,11 +15,11 @@ async function login() {
     document.getElementById('loginfailed').style.display = 'none';
     const username = listLoginForm.querySelector('[name="username"]').value;
     const password = listLoginForm.querySelector('[name="password"]').value;
-    const loginResult = await post('/api/arrange/login', undefined, { username: username, password: password });
-    if (!loginResult._id) {
+    const loginResult = await arrange.login(username, password);
+    if (loginResult.error) {
         document.getElementById('loginfailed').style.display = 'initial';
     } else {
-        user = loginResult;
+        loggedin = true;
         showList();
     }
 }
@@ -34,11 +36,11 @@ async function register() {
         rf2.style.display = 'initial';
         return;
     }
-    const registerResult = await post('/api/arrange/register', undefined, { username: username, password: password1 });
-    if (!registerResult._id) {
+    const registerResult = await arrange.register(username, password1);
+    if (registerResult.error) {
         rf1.style.display = 'initial';
     } else {
-        user = registerResult;
+        loggedin = true;
         showList();
     }
 }
@@ -46,7 +48,7 @@ async function register() {
 function goBack() {
     if (model) {
         showList();
-    } else if (user) {
+    } else if (loggedin) {
         location.reload();
     } else {
         location.href = '../';
@@ -56,18 +58,17 @@ function goBack() {
 async function showList() {
     model = null;
     _id = null;
-    const modelids = await post('/api/arrange/list/models', user.token);
+    const models = await arrange.list('models', { query: { _ownerid: arrange.currentuser._id }, result: { thumbnail: true, _publiclyreadable: true } });
     list.innerHTML = "";
-    modelids.forEach(async function (modelid) {
-        const model = await post('/api/arrange/details/models/' + modelid, user.token, { thumbnail: true, _publiclyreadable: true });
+    models.forEach(function (modelFromServer) {
         const el = document.createElement('div');
-        if (model._publiclyreadable) {
-            el.innerHTML = '<img src="' + model.thumbnail + '" /><span class="published">Veröffentlicht</span>';
+        if (modelFromServer._publiclyreadable) {
+            el.innerHTML = '<img src="' + modelFromServer.thumbnail + '" /><span class="published">Veröffentlicht</span>';
         } else {
-            el.innerHTML = '<img src="' + model.thumbnail + '"/>';
+            el.innerHTML = '<img src="' + modelFromServer.thumbnail + '"/>';
         }
         el.addEventListener('click', function () {
-            showModel(modelid);
+            showModel(modelFromServer._id);
         });
         list.appendChild(el);
     });
@@ -91,7 +92,7 @@ function showRegistrationForm() {
 async function showModel(id) {
     if (id) {
         _id = id;
-        model = await post('/api/arrange/details/models/' + id, user.token);
+        model = await arrange.details('models', id);
     } else {
         _id = null;
         model = {
@@ -146,7 +147,7 @@ function createColorPalette() {
 
 async function deleteModel() {
     if (confirm('Soll das Modell wirklich gelöscht werden?')) {
-        if (_id) await del('/api/arrange/delete/models/' + _id, user.token);
+        if (_id) await arrange.delete('models', _id);
         showList();
     }
 }
@@ -156,7 +157,7 @@ async function duplicate() {
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
     delete model._id;
-    const result = await post('/api/arrange/save/models', user.token, model);
+    const result = await arrange.save('models', model);
     _id = result._id;
     model._id = _id;
     alert('Dupliziert');
@@ -200,7 +201,7 @@ async function save() {
     model.thumbnail = Editor.makeScreenshot();
     model.painted = {}; // In creative mode we do not store painted voxels in the database
     model.version = model.version ? model.version + 1 : 1; // Increment version
-    const result = await post('/api/arrange/save/models', user.token, model);
+    const result = await arrange.save('models', model);
     if (!_id) {
         _id = result._id;
         model._id = _id;
@@ -241,7 +242,7 @@ function toggleEmissive(isEmissive) {
 async function publish() {
     if (!confirm('Wirklich veröffentlichen?')) return;
     removeHiddenBlocks();
-    await post('/api/arrange/setpubliclyreadable/models/' + model._id + '/true', user.token);
+    await arrange.setpubliclyreadable('models', model._id, true);
     await save();
 }
 
