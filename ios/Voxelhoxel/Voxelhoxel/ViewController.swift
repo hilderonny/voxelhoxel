@@ -17,6 +17,12 @@ class ViewController: UIViewController, WKNavigationDelegate {
         super.viewDidLoad()
         let url = URL(string: "https://www.voxelhoxel.de")!
         webView.load(URLRequest(url: url))
+        /*
+        let indexFilePath = Bundle.main.path(forResource: "index", ofType: "html")!
+        let indexContents = try? String(contentsOfFile: indexFilePath, encoding: .utf8)
+        let baseUrl = URL(fileURLWithPath: indexFilePath)
+        webView.loadHTMLString(indexContents!, baseURL: baseUrl)
+ */
     }
     
     override func loadView() {
