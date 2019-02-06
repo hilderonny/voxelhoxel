@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E301F9C6220B1C5B00CF16AE /* palette.png in Resources */ = {isa = PBXBuildFile; fileRef = E301F9B7220B1C5B00CF16AE /* palette.png */; };
+		E301F9C7220B1C5B00CF16AE /* play.html in Resources */ = {isa = PBXBuildFile; fileRef = E301F9B8220B1C5B00CF16AE /* play.html */; };
+		E301F9C8220B1C5B00CF16AE /* complete.png in Resources */ = {isa = PBXBuildFile; fileRef = E301F9B9220B1C5B00CF16AE /* complete.png */; };
+		E301F9C9220B1C5B00CF16AE /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BA220B1C5B00CF16AE /* index.html */; };
+		E301F9CA220B1C5B00CF16AE /* editor.css in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BB220B1C5B00CF16AE /* editor.css */; };
+		E301F9CB220B1C5B00CF16AE /* clear.png in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BC220B1C5B00CF16AE /* clear.png */; };
+		E301F9CC220B1C5B00CF16AE /* localdb.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BD220B1C5B00CF16AE /* localdb.js */; };
+		E301F9CD220B1C5B00CF16AE /* three.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BE220B1C5B00CF16AE /* three.js */; };
+		E301F9CE220B1C5B00CF16AE /* checkmark.png in Resources */ = {isa = PBXBuildFile; fileRef = E301F9BF220B1C5B00CF16AE /* checkmark.png */; };
+		E301F9CF220B1C5B00CF16AE /* editor.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C0220B1C5B00CF16AE /* editor.js */; };
+		E301F9D0220B1C5B00CF16AE /* three.orbitcontrols.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C1220B1C5B00CF16AE /* three.orbitcontrols.js */; };
+		E301F9D1220B1C5B00CF16AE /* Contents.json in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C2220B1C5B00CF16AE /* Contents.json */; };
+		E301F9D2220B1C5B00CF16AE /* utils.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C3220B1C5B00CF16AE /* utils.js */; };
+		E301F9D3220B1C5B00CF16AE /* arrange.js in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C4220B1C5B00CF16AE /* arrange.js */; };
+		E301F9D4220B1C5B00CF16AE /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = E301F9C5220B1C5B00CF16AE /* back.png */; };
 		E34381C4220AC3D800494E26 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34381C3220AC3D800494E26 /* AppDelegate.swift */; };
 		E34381C6220AC3D800494E26 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E34381C5220AC3D800494E26 /* ViewController.swift */; };
 		E34381C9220AC3D800494E26 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E34381C7220AC3D800494E26 /* Main.storyboard */; };
@@ -15,6 +30,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E301F9B7220B1C5B00CF16AE /* palette.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = palette.png; sourceTree = "<group>"; };
+		E301F9B8220B1C5B00CF16AE /* play.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = play.html; sourceTree = "<group>"; };
+		E301F9B9220B1C5B00CF16AE /* complete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = complete.png; sourceTree = "<group>"; };
+		E301F9BA220B1C5B00CF16AE /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		E301F9BB220B1C5B00CF16AE /* editor.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = editor.css; sourceTree = "<group>"; };
+		E301F9BC220B1C5B00CF16AE /* clear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clear.png; sourceTree = "<group>"; };
+		E301F9BD220B1C5B00CF16AE /* localdb.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = localdb.js; sourceTree = "<group>"; };
+		E301F9BE220B1C5B00CF16AE /* three.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = three.js; sourceTree = "<group>"; };
+		E301F9BF220B1C5B00CF16AE /* checkmark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = checkmark.png; sourceTree = "<group>"; };
+		E301F9C0220B1C5B00CF16AE /* editor.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = editor.js; sourceTree = "<group>"; };
+		E301F9C1220B1C5B00CF16AE /* three.orbitcontrols.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = three.orbitcontrols.js; sourceTree = "<group>"; };
+		E301F9C2220B1C5B00CF16AE /* Contents.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Contents.json; sourceTree = "<group>"; };
+		E301F9C3220B1C5B00CF16AE /* utils.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = utils.js; sourceTree = "<group>"; };
+		E301F9C4220B1C5B00CF16AE /* arrange.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = arrange.js; sourceTree = "<group>"; };
+		E301F9C5220B1C5B00CF16AE /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back.png; sourceTree = "<group>"; };
 		E34381C0220AC3D800494E26 /* Voxelhoxel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Voxelhoxel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E34381C3220AC3D800494E26 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E34381C5220AC3D800494E26 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -35,6 +65,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E301F9B6220B1C5B00CF16AE /* web */ = {
+			isa = PBXGroup;
+			children = (
+				E301F9B7220B1C5B00CF16AE /* palette.png */,
+				E301F9B8220B1C5B00CF16AE /* play.html */,
+				E301F9B9220B1C5B00CF16AE /* complete.png */,
+				E301F9BA220B1C5B00CF16AE /* index.html */,
+				E301F9BB220B1C5B00CF16AE /* editor.css */,
+				E301F9BC220B1C5B00CF16AE /* clear.png */,
+				E301F9BD220B1C5B00CF16AE /* localdb.js */,
+				E301F9BE220B1C5B00CF16AE /* three.js */,
+				E301F9BF220B1C5B00CF16AE /* checkmark.png */,
+				E301F9C0220B1C5B00CF16AE /* editor.js */,
+				E301F9C1220B1C5B00CF16AE /* three.orbitcontrols.js */,
+				E301F9C2220B1C5B00CF16AE /* Contents.json */,
+				E301F9C3220B1C5B00CF16AE /* utils.js */,
+				E301F9C4220B1C5B00CF16AE /* arrange.js */,
+				E301F9C5220B1C5B00CF16AE /* back.png */,
+			);
+			path = web;
+			sourceTree = "<group>";
+		};
 		E34381B7220AC3D800494E26 = {
 			isa = PBXGroup;
 			children = (
@@ -54,6 +106,7 @@
 		E34381C2220AC3D800494E26 /* Voxelhoxel */ = {
 			isa = PBXGroup;
 			children = (
+				E301F9B6220B1C5B00CF16AE /* web */,
 				E34381C3220AC3D800494E26 /* AppDelegate.swift */,
 				E34381C5220AC3D800494E26 /* ViewController.swift */,
 				E34381C7220AC3D800494E26 /* Main.storyboard */,
@@ -122,9 +175,24 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E301F9CB220B1C5B00CF16AE /* clear.png in Resources */,
+				E301F9CA220B1C5B00CF16AE /* editor.css in Resources */,
+				E301F9D4220B1C5B00CF16AE /* back.png in Resources */,
+				E301F9C9220B1C5B00CF16AE /* index.html in Resources */,
 				E34381CE220AC3DB00494E26 /* LaunchScreen.storyboard in Resources */,
 				E34381CB220AC3DB00494E26 /* Assets.xcassets in Resources */,
+				E301F9D2220B1C5B00CF16AE /* utils.js in Resources */,
+				E301F9CF220B1C5B00CF16AE /* editor.js in Resources */,
+				E301F9D1220B1C5B00CF16AE /* Contents.json in Resources */,
+				E301F9C7220B1C5B00CF16AE /* play.html in Resources */,
+				E301F9D3220B1C5B00CF16AE /* arrange.js in Resources */,
+				E301F9CE220B1C5B00CF16AE /* checkmark.png in Resources */,
+				E301F9C6220B1C5B00CF16AE /* palette.png in Resources */,
+				E301F9D0220B1C5B00CF16AE /* three.orbitcontrols.js in Resources */,
+				E301F9C8220B1C5B00CF16AE /* complete.png in Resources */,
+				E301F9CC220B1C5B00CF16AE /* localdb.js in Resources */,
 				E34381C9220AC3D800494E26 /* Main.storyboard in Resources */,
+				E301F9CD220B1C5B00CF16AE /* three.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +350,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E644CDJ84J;
 				INFOPLIST_FILE = Voxelhoxel/Info.plist;
@@ -300,6 +369,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = E644CDJ84J;
 				INFOPLIST_FILE = Voxelhoxel/Info.plist;
