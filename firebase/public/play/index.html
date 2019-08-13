@@ -105,7 +105,7 @@
         console.log('We are offline because ', ex);
       }
 
-      const list = document.querySelector('.list');
+      const list = document.querySelector('v-play-list .list');
       localModels.sort(function (a, b) {
         if (a.complete && !b.complete) return 1;
         if (!a.complete && b.complete) return -1;

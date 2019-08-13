@@ -8,8 +8,8 @@
 
 const Editor = (function () {
 
-    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting;
-    const black = new THREE.Color( 0x000000 );
+    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
+    const black = new THREE.Color(0x000000);
 
     function addBox(pos, paletteNumber) {
         const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
@@ -43,7 +43,7 @@ const Editor = (function () {
 
     function animate() {
         //requestAnimationFrame(animate);
-        renderer.animate(function () {
+        renderer.setAnimationLoop(function () {
             controls.update();
             renderer.render(scene, camera);
         });
@@ -219,6 +219,10 @@ const Editor = (function () {
             mesh.material = mesh.standardMaterial;
             mesh.isPainted = true;
             emit('painted', mesh);
+            // Handle left colors
+            colorsLeft[currentColorIndex]--;
+            checkColor(currentColorIndex);
+            config.colorcounternumber.innerHTML = colorsLeft[currentColorIndex];
         }
     }
 
@@ -228,9 +232,61 @@ const Editor = (function () {
         scene.remove(mesh);
     }
 
+    function updateColorBar() {
+        const scene = model.scene;
+        Object.keys(scene).forEach(function (zKey) {
+            const bz = scene[zKey];
+            Object.keys(bz).forEach(function (yKey) {
+                const by = bz[yKey];
+                Object.keys(by).forEach(function (xKey) {
+                    const actualValue = colorsLeft[by[xKey]];
+                    colorsLeft[by[xKey]] = (actualValue ? actualValue : 0) + 1;
+                });
+            });
+        });
+        var html = '';
+        model.colorpalette.forEach(function (color, index) {
+            html += '<label' + (colorsLeft[index] ? '' : ' class="invisible"') + '><input type="radio" name="color" colorIndex="' + index + '" /><div style="background-color:' + color + '"><span class="unchecked">' + index + '</span><img class="checked" src="../images/checkmark.png"/></div></label>';
+        });
+        config.colorbar.innerHTML = html;
+        config.colorbar.querySelectorAll('input').forEach(function (input) {
+            input.addEventListener('change', function () {
+                Editor.selectColor(parseInt(this.getAttribute('colorIndex')));
+            });
+        });
+        checkAllColors();
+    }
+
+    function checkAllColors() {
+        config.completion.classList.remove('complete');
+        const painted = model.painted;
+        Object.keys(painted).forEach(function (zKey) {
+            const bz = painted[zKey];
+            Object.keys(bz).forEach(function (yKey) {
+                const by = bz[yKey];
+                Object.keys(by).forEach(function (xKey) {
+                    const colorIndex = model.scene[zKey][yKey][xKey];
+                    colorsLeft[colorIndex]--;
+                    if (colorsLeft[colorIndex] < 1) checkColor(colorIndex);
+                });
+            });
+        });
+    }
+
+    function checkColor(colorIndex) {
+        if (colorsLeft[colorIndex] < 1) {
+            document.getElementsByName('color')[colorIndex].classList.add('complete');
+            if (Object.values(colorsLeft).reduce(function (pv, cv) { return pv + cv; }, 0) < 1) {
+                model.complete = true;
+                config.completion.classList.add('complete');
+            }
+        }
+    }
+
     return {
 
-        init: function () {
+        init: function (cfg) {
+            config = cfg; // For colorbar
             objects = [];
             // Create scene
             scene = new THREE.Scene();
@@ -277,6 +333,14 @@ const Editor = (function () {
             return renderer;
         },
 
+        clear: async function () {
+            if (!confirm('Soll das Modell wirklich geleert werden?')) return;
+            model.painted = {};
+            delete model.complete;
+            await Editor.save(model);
+            await Editor.loadModel(model);
+        },
+
         forceResize: function () {
             onWindowResize();
         },
@@ -291,20 +355,24 @@ const Editor = (function () {
          *   target: Vector3 of camera target
          */
         loadModel: function (m) {
+            // Clear previous model if there is anything
+            objects.forEach(function (obj) {
+                scene.remove(obj);
+            });
+            objects = [];
+            // Set the new model to the current one
             model = m;
             // Prepare materials
             model.colorpalette.forEach(function (color, index) {
                 numberMaterials.push(createTextTexture(index));
             });
             // Create boxes
-            var boxCount = 0;
-            const scene = model.scene;
-            Object.keys(scene).forEach(function (zKey) {
-                const bz = scene[zKey];
+            const modelScene = model.scene;
+            Object.keys(modelScene).forEach(function (zKey) {
+                const bz = modelScene[zKey];
                 Object.keys(bz).forEach(function (yKey) {
                     const by = bz[yKey];
                     Object.keys(by).forEach(function (xKey) {
-                        boxCount++;
                         addBox({ x: parseInt(xKey), y: parseInt(yKey), z: parseInt(zKey) }, by[xKey]);
                     });
                 });
@@ -315,6 +383,16 @@ const Editor = (function () {
             // Link camera position and target to model for later saving
             model.pos = camera.position;
             model.target = controls.target;
+            // Update color bar
+            colorsLeft = {};
+            updateColorBar();
+            var selectedColorIndex = parseInt(Object.keys(colorsLeft)[0]);
+            document.getElementsByName('color')[selectedColorIndex].checked = true;
+            Editor.selectColor(selectedColorIndex);
+            // Re-init play mode
+            Editor.setMode(currentMode);
+            // Force resize of canvas, can be that the model was loaded after the canvas was initialized
+            onWindowResize();
         },
 
         makeScreenshot: function () {
@@ -337,9 +415,20 @@ const Editor = (function () {
             return data;
         },
 
+        save: async function () {
+            model.thumbnail = Editor.makeScreenshot();
+            var listEl = model.listEl;
+            delete model.listEl; // Cannot save HTML in local storage
+            await LocalDb.saveModel(model);
+            model.listEl = listEl;
+            return model;
+        },
+
         selectColor: function (colorIndex) {
             currentColorIndex = colorIndex;
             if (currentMode === 'play') highlightPlayNumber();
+            config.colorcounternumber.innerHTML = colorsLeft[colorIndex];
+            config.colorcounterblock.style.backgroundColor = model.colorpalette[colorIndex];
         },
 
         setCurrentColor: function (color) {

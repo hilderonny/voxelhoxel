@@ -2,7 +2,6 @@
 <html>
 
 <head>
-    <meta name="google-site-verification" content="zQaYkn8wm5WLw6c2QXr1wmNBG-C8wEwRV7R1mYnmCIQ" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -12,38 +11,76 @@
     <link rel="icon" type="image/png" href="favicon-48x48.png" sizes="48x48" />
     <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="../shared/style.css" />
     <title>Voxelhoxel</title>
-    <style>
-        body { margin: 0; padding: 0 10px; overflow: auto; align-items: center; text-align: center; justify-content: center; font-family: sans-serif; font-size: 9pt; }
-        div { display: flex; flex-direction: column; text-align: center; min-height: 300px; justify-content: center; }
-        a.play { display: block; border: 6px solid; border-color: #0c0 #040 #040 #0c0; padding: 4px 16px; text-decoration: none; font-family: monospace; text-transform: uppercase; font-weight: bold; font-size: 64px; background-color: #080; color: #ff0; margin: 20px auto; }
-        a.create { display: block; border: 3px solid; border-color: #ccc #444 #444 #ccc; padding: 6px 10px; text-decoration: none; font-family: monospace; text-transform: uppercase; font-weight: bold; font-size: 20px; background-color: #888; color: #fff; margin: 20px auto; }
-        p { max-width: 90%; color: #444; margin: 10px auto; }
-        form { margin: 10px 0; }
-    </style>
+    <script defer src="/__/firebase/6.3.5/firebase-app.js"></script>
+    <script defer src="/__/firebase/6.3.5/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+    <script src="../shared/localdb.js"></script>
+    <script src="../shared/three.js"></script>
+    <script src="../shared/three.orbitcontrols.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="../shared/editor.js"></script>
+    <script src="../shared/index.js"></script>
 </head>
 
-<body>
-    <div>
-        <a class="play" href="play/">Spielen</a>
-        <a class="create" href="create/" style="display:none">Kreativmodus</a>
-    </div>
-    <p>
-        Dieses Spiel ist dazu gedacht, Kindern eine kurzweilige Abwechslung zu geben und Eltern das entspannte Wissen,
-        ihre Kinder auch mal allein ohne Gefahr mit der digitalen Technik spielen zu lassen &middot;
-        Das Spiel ist völlig kostenlos &middot;
-        Es wird keine Werbung eingeblendet &middot;
-        Es werden keinerlei Daten gesammelt, gar nichts &middot;
-        Es wird kein Tracking verwendet und keine Cookies gesetzt &middot;
-        Es werden auch keine Zugriffe protokolliert &middot;
-        Der Fortschritt wird ausschließlich auf dem Gerät gespeichert, auf dem gespielt wird &middot;
-        Vom Server werden beim Start ausschließlich vorhandene Modelle geladen
-    </p>
-    <p>
-        Für Fragen und Meinungen könnt ihr mich auf <a href="https://www.facebook.com/ronny.hildebrandt.1">Facebook</a>
-        oder <a href="https://twitter.com/RonnyHildebran1">Twitter</a> erreichen.
-    </p>
-    <p><a href="datenschutz.html">Datenschutzerklärung</a> &middot; <a href="impressum.html">Impressum</a></p>
+<body class="home">
+
+    <!-- Home page -->
+    <v-home>
+        <div>
+            <button class="play" onclick="showPlayList();">Spielen</button>
+        </div>
+        <p>
+            Dieses Spiel ist dazu gedacht, Kindern eine kurzweilige Abwechslung zu geben und Eltern das entspannte
+            Wissen,
+            ihre Kinder auch mal allein ohne Gefahr mit der digitalen Technik spielen zu lassen &middot;
+            Das Spiel ist völlig kostenlos &middot;
+            Es wird keine Werbung eingeblendet &middot;
+            Es werden keinerlei Daten gesammelt, gar nichts &middot;
+            Es wird kein Tracking verwendet und keine Cookies gesetzt &middot;
+            Es werden auch keine Zugriffe protokolliert &middot;
+            Der Fortschritt wird ausschließlich auf dem Gerät gespeichert, auf dem gespielt wird &middot;
+            Vom Server werden beim Start ausschließlich vorhandene Modelle geladen
+        </p>
+        <p>
+            Für Fragen und Meinungen könnt ihr mich auf <a
+                href="https://www.facebook.com/ronny.hildebrandt.1">Facebook</a>
+            oder <a href="https://twitter.com/RonnyHildebran1">Twitter</a> erreichen.
+        </p>
+        <p><a href="datenschutz.html">Datenschutzerklärung</a> &middot; <a href="impressum.html">Impressum</a></p>
+
+    </v-home>
+
+    <!-- Play mode model list -->
+    <v-play-list>
+        <div class="list"></div>
+    </v-play-list>
+
+    <!-- Model play screen for desktop and mobiles -->
+    <v-play-normal>
+
+        <v-rendering>
+            <div class="colorcounter">
+                <v-colorcounterblock></v-colorcounterblock>
+                <v-colorcounternumber></v-colorcounternumber>
+            </div>
+            <img class="completion" src="../images/complete.png" />
+        </v-rendering>
+
+        <v-toolbar>
+            <div class="spacer"></div>
+            <img onclick="Editor.clear();" src="../images/clear.png" />
+        </v-toolbar>
+
+        <v-colorbar></v-colorbar>
+
+        <v-toptoolbar>
+            <img onclick="Editor.save().then(function(model) { showPlayList(model); });" src="../images/back.png" />
+        </v-toptoolbar>
+
+    </v-play-normal>
+
 </body>
 
 </html>
