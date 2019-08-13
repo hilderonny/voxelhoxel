@@ -1,10 +1,10 @@
 {
     "name": "Voxelhoxel",
     "short_name": "Voxelhoxel",
-    "start_url": "/play/",
+    "start_url": "/",
     "background_color": "#A37F81",
     "display": "standalone",
-    "scope": "/play/",
+    "scope": "/",
     "theme_color": "#A37F81",
     "icons": [
         {
