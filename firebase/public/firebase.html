@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Voxelhoxel</title>
+    <script defer src="/__/firebase/6.3.5/firebase-app.js"></script>
+    <script defer src="/__/firebase/6.3.5/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async function() {
+
+        // Connect to database
+        var db = firebase.firestore();
+        
+        // Enable offline caching of models
+        await db.enablePersistence();
+
+        // Fetch all models from database
+        db.collection('models').get().then(function(result) {
+          result.forEach((model) => {
+            console.log(model.id, model.data());
+          });
+        });
+
+      });
+    </script>
+  </head>
+
+  <body>
+
+  </body>
+
+</html>
