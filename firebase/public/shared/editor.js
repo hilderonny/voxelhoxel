@@ -8,27 +8,70 @@
 
 const Editor = (function () {
 
-    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
+    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], planes = [], boxes = {}, previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
     const black = new THREE.Color(0x000000);
+    var standardMaterials = {};
 
-    function addBox(pos, paletteNumber) {
-        const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-        const standardMaterial = new THREE.MeshLambertMaterial({ color: model.colorpalette[paletteNumber] });
-        const mesh = new THREE.Mesh(geometry, standardMaterial);
-        mesh.numbersMaterial = numberMaterials[paletteNumber];
-        mesh.standardMaterial = standardMaterial;
+    function createPlane(paletteNumber, material, position, rotation) {
+        var geometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1);
+        const mesh = new THREE.Mesh(geometry, material);
         mesh.paletteNumber = paletteNumber;
-        mesh.position.x = pos.x;
-        mesh.position.y = pos.y;
-        mesh.position.z = pos.z;
+        mesh.position.x = position[0];
+        mesh.position.y = position[1];
+        mesh.position.z = position[2];
+        if (rotation[0]) mesh.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 0), rotation[0]);
+        if (rotation[1]) mesh.setRotationFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation[1]);
+        if (rotation[2]) mesh.setRotationFromAxisAngle(new THREE.Vector3(0, 0, 1), rotation[2]);
         mesh.updateMatrix();
         mesh.matrixAutoUpdate = false;
-        const boxes = model.scene;
-        if (!boxes[pos.z]) boxes[pos.z] = {};
-        const bz = boxes[pos.z];
-        if (!bz[pos.y]) bz[pos.y] = {};
-        const by = bz[pos.y];
-        by[pos.x] = paletteNumber;
+        return mesh;
+    }
+
+    function addBox(pos, paletteNumber) {
+        var x = pos.x, y = pos.y, z = pos.z;
+        var mesh = new THREE.Group();
+        var color = model.colorpalette[paletteNumber];
+        var standardMaterial = standardMaterials[color];
+        if (!standardMaterial) {
+            standardMaterial = new THREE.MeshLambertMaterial({ color: color });
+            standardMaterials[color] = standardMaterial;
+        }
+        mesh.numbersMaterial = numberMaterials[paletteNumber];
+        mesh.standardMaterial = standardMaterial;
+        mesh.planes = {
+            top: createPlane(paletteNumber, standardMaterial, [0, .5, 0], [-1.5708, 0, 0]),
+            bottom: createPlane(paletteNumber, standardMaterial, [0, -.5, 0], [1.5708, 0, 0]),
+            left: createPlane(paletteNumber, standardMaterial, [-.5, 0, 0], [0, -1.5708, 0]),
+            right: createPlane(paletteNumber, standardMaterial, [.5, 0, 0], [0, 1.5708, 0]),
+            front: createPlane(paletteNumber, standardMaterial, [0, 0, .5], [0, 0, 0]),
+            back: createPlane(paletteNumber, standardMaterial, [0, 0, -.5], [0, 3.14159, 0]),
+        }
+        Object.values(mesh.planes).forEach(function(plane) {
+            mesh.add(plane);
+            planes.push(plane);
+        });
+        mesh.paletteNumber = paletteNumber;
+        mesh.position.x = x;
+        mesh.position.y = y;
+        mesh.position.z = z;
+        mesh.updateMatrix();
+        mesh.matrixAutoUpdate = false;
+        // Set material for plane
+        mesh.setMaterial = function(material) {
+            Object.values(mesh.planes).forEach(plane => plane.material = material);
+        }
+        // Remove a plane
+        mesh.hidePlane = function(dir) {
+            var plane = mesh.planes[dir];
+            if (plane) {
+                mesh.remove(plane);
+                planes.splice(planes.indexOf(plane), 1);
+            }
+        }
+        // Remember box for later access
+        if (!boxes[z]) boxes[z] = {};
+        if (!boxes[z][y]) boxes[z][y] = {};
+        boxes[z][y][x] = mesh;
         objects.push(mesh);
         scene.add(mesh);
     }
@@ -71,9 +114,9 @@ const Editor = (function () {
     function handleMouseDown() {
         if (isBlocked) return;
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(planes);
         if (intersects.length > 0) {
-            const mesh = intersects[0].object;
+            const mesh = intersects[0].object.parent;
             if (!mesh.isPainted && mesh.paletteNumber === currentColorIndex) {
                 isPainting = true;
             } else {
@@ -88,18 +131,11 @@ const Editor = (function () {
     function handleMouseUp() {
         if (isBlocked) return;
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(planes);
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            if (currentMode === 'add') {
-                const position = intersect.object.position.clone().add(intersect.face.normal);
-                addBox(position, currentColorIndex);
-            } else if (currentMode === 'remove') {
-                removeBox(intersect.object);
-            } else if (currentMode === 'paint') {
-                paintBox(intersect.object);
-            } else if (!isMoving && currentMode === 'play') {
-                playPaintBox(intersect.object);
+            if (!isMoving && currentMode === 'play') {
+                playPaintBox(intersect.object.parent); // object is here a plane, we need the parent box
             }
         }
         updateViewTarget();
@@ -120,27 +156,10 @@ const Editor = (function () {
         if (isMoving && !isPainting) return;
         mouse.set((event.clientX / renderer.domElement.parentNode.clientWidth) * 2 - 1, - (event.clientY / renderer.domElement.parentNode.clientHeight) * 2 + 1);
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(planes);
         if (intersects.length > 0) {
-            if (currentMode === 'add') {
-                const intersect = intersects[0];
-                rollOverMesh.position.copy(intersect.object.position).add(intersect.face.normal);
-                if (!rollOverMesh.visible) scene.add(rollOverMesh);
-                rollOverMesh.visible = true;
-            } else if (currentMode === 'remove') {
-                const obj = intersects[0].object;
-                if (previousIntersection) previousIntersection.material.emissive.setHex(0x000000);
-                obj.material.emissive.setHex(0xff0000);
-                previousIntersection = obj;
-            } else if (currentMode === 'paint') {
-                const obj = intersects[0].object;
-                if (previousIntersection) {
-                    previousIntersection.material.emissive.setHex(0x000000);
-                }
-                obj.material.emissive.setHex(0x00ff00);
-                previousIntersection = obj;
-            } else if (currentMode === 'play' && isPainting) {
-                playPaintBox(intersects[0].object);
+            if (currentMode === 'play' && isPainting) {
+                playPaintBox(intersects[0].object.parent); // object is here a plane, we need the parent box
             }
         } else {
             if (rollOverMesh.visible) scene.remove(rollOverMesh);
@@ -216,7 +235,7 @@ const Editor = (function () {
         const y = z[mesh.position.y];
         if (!y[mesh.position.x]) {
             y[mesh.position.x] = true;
-            mesh.material = mesh.standardMaterial;
+            mesh.setMaterial(mesh.standardMaterial);
             mesh.isPainted = true;
             emit('painted', mesh);
             // Handle left colors
@@ -224,12 +243,6 @@ const Editor = (function () {
             checkColor(currentColorIndex);
             config.colorcounternumber.innerHTML = colorsLeft[currentColorIndex];
         }
-    }
-
-    function removeBox(mesh) {
-        delete model.scene[mesh.position.z][mesh.position.y][mesh.position.x];
-        objects.splice(objects.indexOf(mesh), 1);
-        scene.remove(mesh);
     }
 
     function updateColorBar() {
@@ -368,12 +381,29 @@ const Editor = (function () {
             });
             // Create boxes
             const modelScene = model.scene;
+            boxes = {}; // Clear boxes from previous model
+            planes = []; // Also clear planes from previous model
             Object.keys(modelScene).forEach(function (zKey) {
                 const bz = modelScene[zKey];
                 Object.keys(bz).forEach(function (yKey) {
                     const by = bz[yKey];
                     Object.keys(by).forEach(function (xKey) {
                         addBox({ x: parseInt(xKey), y: parseInt(yKey), z: parseInt(zKey) }, by[xKey]);
+                    });
+                });
+            });
+            // Hide planes which touch other boxes
+            Object.keys(boxes).forEach(function (zKey) {
+                const bz = boxes[zKey];
+                var z = parseInt(zKey);
+                Object.keys(bz).forEach(function (yKey) {
+                    const by = bz[yKey];
+                    var y = parseInt(yKey);
+                    Object.keys(by).forEach(function (xKey) {
+                        var x = parseInt(xKey);
+                        if (boxes[z] && boxes[z][y + 1] && boxes[z][y + 1][x]) { boxes[z][y][x].hidePlane('top'); boxes[z][y + 1][x].hidePlane('bottom'); }
+                        if (boxes[z] && boxes[z][y] && boxes[z][y][x + 1]) { boxes[z][y][x].hidePlane('right'); boxes[z][y][x + 1].hidePlane('left'); }
+                        if (boxes[z + 1] && boxes[z + 1][y] && boxes[z + 1][y][x]) { boxes[z][y][x].hidePlane('front'); boxes[z + 1][y][x].hidePlane('back'); }
                     });
                 });
             });
@@ -458,7 +488,7 @@ const Editor = (function () {
                 const z = obj.position.z, y = obj.position.y, x = obj.position.x;
                 const isPainted = model.painted[z] && model.painted[z][y] && model.painted[z][y][x];
                 if (isPainted) obj.isPainted = true;
-                obj.material = (!isPainted && isNumber) ? obj.numbersMaterial : obj.standardMaterial;
+                obj.setMaterial((!isPainted && isNumber) ? obj.numbersMaterial : obj.standardMaterial);
             });
         },
 

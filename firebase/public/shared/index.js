@@ -59,7 +59,6 @@ window.addEventListener('DOMContentLoaded', async function () {
     });
     document.querySelector('v-play-normal v-rendering').appendChild(renderer.domElement);
     Editor.start();
-
 });
 
 // Show the list of playable models
