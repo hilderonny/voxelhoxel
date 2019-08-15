@@ -8,7 +8,7 @@
 
 const Editor = (function () {
 
-    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], planes = [], boxes = {}, previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
+    var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], boxes = {}, previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
     const black = new THREE.Color(0x000000);
     var standardMaterials = {};
 
@@ -48,7 +48,6 @@ const Editor = (function () {
         }
         Object.values(mesh.planes).forEach(function(plane) {
             mesh.add(plane);
-            planes.push(plane);
         });
         mesh.paletteNumber = paletteNumber;
         mesh.position.x = x;
@@ -65,7 +64,6 @@ const Editor = (function () {
             var plane = mesh.planes[dir];
             if (plane) {
                 mesh.remove(plane);
-                planes.splice(planes.indexOf(plane), 1);
             }
         }
         // Remember box for later access
@@ -114,7 +112,7 @@ const Editor = (function () {
     function handleMouseDown() {
         if (isBlocked) return;
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(planes);
+        const intersects = raycaster.intersectObjects(objects, true);
         if (intersects.length > 0) {
             const mesh = intersects[0].object.parent;
             if (!mesh.isPainted && mesh.paletteNumber === currentColorIndex) {
@@ -131,7 +129,7 @@ const Editor = (function () {
     function handleMouseUp() {
         if (isBlocked) return;
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(planes);
+        const intersects = raycaster.intersectObjects(objects, true);
         if (intersects.length > 0) {
             const intersect = intersects[0];
             if (!isMoving && currentMode === 'play') {
@@ -156,7 +154,7 @@ const Editor = (function () {
         if (isMoving && !isPainting) return;
         mouse.set((event.clientX / renderer.domElement.parentNode.clientWidth) * 2 - 1, - (event.clientY / renderer.domElement.parentNode.clientHeight) * 2 + 1);
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(planes);
+        const intersects = raycaster.intersectObjects(objects, true);
         if (intersects.length > 0) {
             if (currentMode === 'play' && isPainting) {
                 playPaintBox(intersects[0].object.parent); // object is here a plane, we need the parent box
@@ -382,7 +380,6 @@ const Editor = (function () {
             // Create boxes
             const modelScene = model.scene;
             boxes = {}; // Clear boxes from previous model
-            planes = []; // Also clear planes from previous model
             Object.keys(modelScene).forEach(function (zKey) {
                 const bz = modelScene[zKey];
                 Object.keys(bz).forEach(function (yKey) {
