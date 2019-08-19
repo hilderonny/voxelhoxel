@@ -193,12 +193,13 @@ const Editor = (function () {
     }
 
     function onDocumentTouchMove() {
+        console.log(onDocumentTouchMove);
         if (currentMode !== 'play' || !isPainting) return;
         mouse.set((event.changedTouches[0].clientX / renderer.domElement.parentNode.clientWidth) * 2 - 1, - (event.changedTouches[0].clientY / renderer.domElement.parentNode.clientHeight) * 2 + 1);
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(objects);
+        const intersects = raycaster.intersectObjects(objects, true);
         if (intersects.length > 0) {
-            playPaintBox(intersects[0].object);
+            playPaintBox(intersects[0].object.parent);
         }
     }
 
