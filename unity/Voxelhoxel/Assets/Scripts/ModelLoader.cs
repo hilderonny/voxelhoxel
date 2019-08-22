@@ -1,17 +1,56 @@
-﻿using System.Collections;
+﻿using Firebase;
+using Firebase.Database;
+using Firebase.Extensions;
+using Firebase.Unity.Editor;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof (MeshFilter))]
-[RequireComponent(typeof (MeshRenderer))]
 public class ModelLoader : MonoBehaviour
 {
     // Start is called before the first frame update
 	void Start () {
-		CreateCube ();
-	}
+        CreateCube(0, 0, 0);
+        CreateCube(1, 1, 0);
 
-	private void CreateCube () {
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
+            if (task.Result == DependencyStatus.Available)
+            {
+                Initialize();
+            }
+            else
+            {
+                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
+            }
+        });
+    }
+
+    protected virtual void Initialize()
+    {
+        FirebaseApp app = FirebaseApp.DefaultInstance;
+        // NOTE: You'll need to replace this url with your Firebase App's database
+        // path in order for the database connection to work correctly in editor.
+        app.SetEditorDatabaseUrl("https://voxelhoxel-defdc.firebaseio.com/");
+        if (app.Options.DatabaseUrl != null) app.SetEditorDatabaseUrl(app.Options.DatabaseUrl);
+        FirebaseDatabase.DefaultInstance.GetReference("models").ValueChanged += ModelLoader_ValueChanged;
+    }
+
+    private void ModelLoader_ValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        if (e.DatabaseError != null)
+        {
+            Debug.LogError(e.DatabaseError.Message);
+            return;
+        }
+        if (e.Snapshot == null || e.Snapshot.ChildrenCount < 1) return;
+        Debug.Log(e.Snapshot.GetRawJsonValue());
+        foreach (var model in e.Snapshot.Children)
+        {
+            Debug.Log(model.GetRawJsonValue());
+        }
+    }
+
+    private void CreateCube (int x, int y, int z) {
 		Vector3[] vertices = {
 			new Vector3 (0, 0, 0),
 			new Vector3 (1, 0, 0),
@@ -38,13 +77,18 @@ public class ModelLoader : MonoBehaviour
 			0, 1, 6
 		};
 			
-		Mesh mesh = GetComponent<MeshFilter> ().mesh;
+		Mesh mesh = new Mesh();
 		mesh.Clear ();
 		mesh.vertices = vertices;
 		mesh.triangles = triangles;
 		mesh.Optimize ();
 		mesh.RecalculateNormals ();
-	}
+
+        GameObject gameObject = new GameObject("Mesh" + Random.value, typeof(MeshFilter), typeof(MeshRenderer));
+        gameObject.GetComponent<MeshFilter>().mesh = mesh;
+        //gameObject.transform.parent = GetComponent<GameObject>().transform;
+        gameObject.transform.Translate(x, y, z);
+    }
 
     // Update is called once per frame
     void Update()
