@@ -2,26 +2,28 @@
 window.addEventListener('DOMContentLoaded', async function () {
 
     // Connect to database
-    var db = firebase.firestore();
-    // Enable offline caching of models
-    await db.enablePersistence();
+    var realtimedb = firebase.database();
 
     // Prepare models
     var localModels = await LocalDb.listModels();
     try {
         // Fetch all models from database
-        var result = await db.collection('models').get();
+        var realtimeresult = await realtimedb.ref('/models/').once('value');
         // Save models in local database
-        result.forEach(function (element) {
-            var modelFromServer = element.data();
-            var modelId = modelFromServer._id;
+        realtimeresult.forEach(function (element) {
+            var modelFromServer = element.val();
+            var modelId = element.key;
+            modelFromServer._id = modelId; // For local storage
             var localModelIndex = localModels.findIndex(function (m) { return m._id === modelId });
             if (localModelIndex < 0) {
+                modelFromServer._id = modelId;
+                modelFromServer.painted = [];
                 LocalDb.saveModel(modelFromServer);
                 localModels.push(modelFromServer);
             } else {
                 var localModel = localModels[localModelIndex];
-                if (Object.keys(localModel.painted).length < 1 && localModel.version !== modelFromServer.version) {
+                if (!localModel.painted) localModel.painted = []; // painted may not be stored at server but we need it in the editor
+                if (Object.keys(localModel.painted).length < 1) {
                     LocalDb.saveModel(modelFromServer);
                     localModels[localModelIndex] = modelFromServer;
                 }
@@ -40,7 +42,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     });
     localModels.forEach(function (model) {
         const el = document.createElement('div');
-        el.innerHTML = '<img src="' + model.thumbnail + '" class="' + ((Object.keys(model.painted).length < 1) ? 'new' : '')  + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
+        el.innerHTML = '<img src="' + model.thumbnail + '" class="' + ((!model.painted || Object.keys(model.painted).length < 1) ? 'new' : '')  + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
         el.addEventListener('click', function () {
             showPlayModel(model);
         });

@@ -74,11 +74,15 @@ const LocalDb = (function() {
     saveModel: function(model) {
       return new Promise(async function(resolve, reject) {
         const db = await getDb();
+        var listEl = model.listEl; // HTML element cannot be stored
+        delete model.listEl;
         const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).put(model);
         request.onerror = function() {
+          model.listEl = listEl;
           reject(request);
         };
         request.onsuccess = function() {
+          model.listEl = listEl;
           resolve(request.result);
         };
       });
