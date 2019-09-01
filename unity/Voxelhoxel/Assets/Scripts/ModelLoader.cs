@@ -2,17 +2,12 @@
 using Firebase.Database;
 using Firebase.Extensions;
 using Firebase.Unity.Editor;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ModelLoader : MonoBehaviour
 {
     // Start is called before the first frame update
 	void Start () {
-        CreateCube(0, 0, 0);
-        CreateCube(1, 1, 0);
-
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
             if (task.Result == DependencyStatus.Available)
             {
@@ -43,14 +38,21 @@ public class ModelLoader : MonoBehaviour
             return;
         }
         if (e.Snapshot == null || e.Snapshot.ChildrenCount < 1) return;
-        Debug.Log(e.Snapshot.GetRawJsonValue());
+        //Debug.Log(e.Snapshot.GetRawJsonValue());
         foreach (var model in e.Snapshot.Children)
         {
+            var scene = model.Child("scene");
             Debug.Log(model.GetRawJsonValue());
+            foreach (var box in scene.Children) {
+                var key = box.Key;
+                var vec = box.Value;
+                Debug.Log(key);
+                Debug.Log(vec);
+            }
         }
     }
 
-    private void CreateCube (int x, int y, int z) {
+    private void CreateCube (string key, int x, int y, int z) {
 		Vector3[] vertices = {
 			new Vector3 (0, 0, 0),
 			new Vector3 (1, 0, 0),
@@ -84,7 +86,7 @@ public class ModelLoader : MonoBehaviour
 		mesh.Optimize ();
 		mesh.RecalculateNormals ();
 
-        GameObject gameObject = new GameObject("Mesh" + Random.value, typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject gameObject = new GameObject("Mesh" + key, typeof(MeshFilter), typeof(MeshRenderer));
         gameObject.GetComponent<MeshFilter>().mesh = mesh;
         //gameObject.transform.parent = GetComponent<GameObject>().transform;
         gameObject.transform.Translate(x, y, z);
