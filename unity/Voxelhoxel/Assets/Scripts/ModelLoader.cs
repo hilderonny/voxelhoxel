@@ -1,4 +1,6 @@
-﻿using Firebase;
+﻿using System;
+using System.Collections.Generic;
+using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
 using Firebase.Unity.Editor;
@@ -6,6 +8,7 @@ using UnityEngine;
 
 public class ModelLoader : MonoBehaviour
 {
+
     // Start is called before the first frame update
 	void Start () {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
@@ -38,21 +41,47 @@ public class ModelLoader : MonoBehaviour
             return;
         }
         if (e.Snapshot == null || e.Snapshot.ChildrenCount < 1) return;
-        //Debug.Log(e.Snapshot.GetRawJsonValue());
+        int dz = 0;
         foreach (var model in e.Snapshot.Children)
         {
+            var materials = CreateMaterials(model.Child("colorpalette"));
             var scene = model.Child("scene");
-            Debug.Log(model.GetRawJsonValue());
-            foreach (var box in scene.Children) {
-                var key = box.Key;
-                var vec = box.Value;
-                Debug.Log(key);
-                Debug.Log(vec);
+            foreach (var xValues in scene.Children) {
+                var x = int.Parse(xValues.Key);
+                foreach (var yValues in xValues.Children) {
+                    var y = int.Parse(yValues.Key);
+                    foreach (var zValue in yValues.Children) {
+                        var z = Convert.ToInt32(zValue.Key);
+                        var paletteIndex = Convert.ToInt32(zValue.Value);
+                        CreateCube(x, y, z, materials[paletteIndex]).transform.Translate(0, 0, dz);
+                    }
+                }
             }
+            dz -= 10;
+            //return; // After first model
         }
     }
 
-    private void CreateCube (string key, int x, int y, int z) {
+    private List<Material> CreateMaterials(DataSnapshot palette) {
+        var shader = Shader.Find("Standard");
+        var materials = new List<Material>();
+        foreach (var entry in (List<object>)(palette.Value)) {
+            Color color;
+            ColorUtility.TryParseHtmlString(entry.ToString(), out color);
+            var material = new Material(shader);
+            material.color = color;
+            materials.Add(material);
+        }
+        return materials;
+    }
+
+    private GameObject CreateCube (float x, float y, float z, Material material) {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        cube.GetComponent<Renderer>().material = material;
+        //gameObject.transform.parent = GetComponent<GameObject>().transform;
+        cube.transform.Translate(x, y, z);
+        return cube;
+        /*
 		Vector3[] vertices = {
 			new Vector3 (0, 0, 0),
 			new Vector3 (1, 0, 0),
@@ -78,6 +107,9 @@ public class ModelLoader : MonoBehaviour
 			0, 6, 7, //face bottom
 			0, 1, 6
 		};
+        // Hier müssen noch die Normalen eingebaut werden
+        // Da diese aber per Vertex definiert werden, müssen alle Faces eigene
+        // Vertexe bekommen.
 			
 		Mesh mesh = new Mesh();
 		mesh.Clear ();
@@ -86,10 +118,12 @@ public class ModelLoader : MonoBehaviour
 		mesh.Optimize ();
 		mesh.RecalculateNormals ();
 
-        GameObject gameObject = new GameObject("Mesh" + key, typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject gameObject = new GameObject("Box", typeof(MeshFilter), typeof(MeshRenderer));
         gameObject.GetComponent<MeshFilter>().mesh = mesh;
+        gameObject.GetComponent<Renderer>().material = material;
         //gameObject.transform.parent = GetComponent<GameObject>().transform;
         gameObject.transform.Translate(x, y, z);
+        */
     }
 
     // Update is called once per frame
