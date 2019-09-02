@@ -59,6 +59,7 @@
      <Compile Include="Assets\Scripts\ModelListItem.cs" />
      <Compile Include="Assets\Scripts\ModelLoader.cs" />
      <Compile Include="Assets\Scripts\OrbitControls.cs" />
+     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-storage-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-database-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\Plugins\link.xml" />
@@ -294,6 +295,9 @@
  </Reference>
  <Reference Include="Unity.Tasks">
  <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Parse/Plugins/dotNet45/Unity.Tasks.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Storage">
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Storage.dll</HintPath>
  </Reference>
  <Reference Include="netstandard">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.1f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
