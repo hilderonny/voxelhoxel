@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
@@ -8,6 +9,11 @@ using UnityEngine;
 
 public class ModelLoader : MonoBehaviour
 {
+
+    [Tooltip("Shader, der für das Material der Blöcke benutzt wird")]
+    public Shader shader;
+
+    private float dz = 0;
 
     // Start is called before the first frame update
 	void Start () {
@@ -30,17 +36,68 @@ public class ModelLoader : MonoBehaviour
         // path in order for the database connection to work correctly in editor.
         app.SetEditorDatabaseUrl("https://voxelhoxel-defdc.firebaseio.com/");
         if (app.Options.DatabaseUrl != null) app.SetEditorDatabaseUrl(app.Options.DatabaseUrl);
-        FirebaseDatabase.DefaultInstance.GetReference("models").ValueChanged += ModelLoader_ValueChanged;
+        //FirebaseDatabase.DefaultInstance.GetReference("models").ValueChanged += ModelLoader_ValueChanged;
+        FirebaseDatabase.DefaultInstance.GetReference("modelmetas").GetValueAsync().ContinueWith(ModelMetasLoaded);
+    }
+
+    // List of meta data of all models
+    private void ModelMetasLoaded(Task<DataSnapshot> task) {
+        if (task.IsFaulted) {
+            Debug.LogError(task.Exception.Message);
+            return;
+        }
+        DataSnapshot snapshot = task.Result;
+        var detailsReference = FirebaseDatabase.DefaultInstance.GetReference("modeldetails");
+        foreach(DataSnapshot model in snapshot.Children) {
+            //Debug.Log(model.Key + " - " + model.GetRawJsonValue());
+            detailsReference.Child(model.Key).ValueChanged.ContinueWith(ModelDetailsLoaded);
+        }
+    }
+
+    // Single model loaded
+    private void ModelDetailsLoaded(Task<DataSnapshot> task) {
+        if (task.IsFaulted) {
+            Debug.LogError(task.Exception.Message);
+            return;
+        }
+        DataSnapshot snapshot = task.Result;
+        //Debug.Log(snapshot.Key + " - " + snapshot.GetRawJsonValue());
+        InstantiateModel(snapshot);
+    }
+
+    private void InstantiateModel(DataSnapshot modelDetails) {
+        //Debug.Log(modelDetails.GetRawJsonValue());
+        var materials = CreateMaterials(modelDetails.Child("colorpalette"));
+        /*
+        var scene = modelDetails.Child("scene");
+        Debug.Log(scene.GetRawJsonValue());
+        foreach (var xValues in scene.Children) {
+            var x = int.Parse(xValues.Key);
+            foreach (var yValues in xValues.Children) {
+                var y = int.Parse(yValues.Key);
+                foreach (var zValue in yValues.Children) {
+                    var z = Convert.ToInt32(zValue.Key);
+                    var paletteIndex = Convert.ToInt32(zValue.Value);
+                    CreateCube(x, y, z, materials[paletteIndex]).transform.Translate(0, 0, dz);
+                }
+            }
+        }
+        dz += 10;
+        */
     }
 
     private void ModelLoader_ValueChanged(object sender, ValueChangedEventArgs e)
     {
+        /*
         if (e.DatabaseError != null)
         {
             Debug.LogError(e.DatabaseError.Message);
             return;
         }
         if (e.Snapshot == null || e.Snapshot.ChildrenCount < 1) return;
+        foreach(var model in e.Snapshot.Children) {
+            Debug.Log(model.Key + " - " + model.GetRawJsonValue());
+        }
         int dz = 0;
         foreach (var model in e.Snapshot.Children)
         {
@@ -60,11 +117,15 @@ public class ModelLoader : MonoBehaviour
             dz -= 10;
             //return; // After first model
         }
+        */
     }
 
     private List<Material> CreateMaterials(DataSnapshot palette) {
-        var shader = Shader.Find("Standard");
+        //Debug.Log(palette.GetRawJsonValue());
         var materials = new List<Material>();
+        Debug.Log(shader);
+        /*
+        Debug.Log(palette.Value);
         foreach (var entry in (List<object>)(palette.Value)) {
             Color color;
             ColorUtility.TryParseHtmlString(entry.ToString(), out color);
@@ -72,6 +133,8 @@ public class ModelLoader : MonoBehaviour
             material.color = color;
             materials.Add(material);
         }
+        Debug.Log(materials);
+        */
         return materials;
     }
 
