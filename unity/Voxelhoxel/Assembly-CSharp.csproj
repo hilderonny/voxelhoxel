@@ -53,9 +53,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\OrbitControls.cs" />
      <Compile Include="Assets\Scripts\Model.cs" />
      <Compile Include="Assets\Scripts\ModelLoader.cs" />
+     <Compile Include="Assets\Scripts\OrbitControls.cs" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-database-unity\maven-metadata.xml" />
      <None Include="Assets\Firebase\Plugins\link.xml" />

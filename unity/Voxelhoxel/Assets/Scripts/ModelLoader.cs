@@ -50,7 +50,7 @@ public class ModelLoader : MonoBehaviour
         var detailsReference = FirebaseDatabase.DefaultInstance.GetReference("modeldetails");
         foreach(DataSnapshot model in snapshot.Children) {
             //Debug.Log(model.Key + " - " + model.GetRawJsonValue());
-            detailsReference.Child(model.Key).ValueChanged.ContinueWith(ModelDetailsLoaded);
+            detailsReference.Child(model.Key).GetValueAsync().ContinueWith(ModelDetailsLoaded);
         }
     }
 
