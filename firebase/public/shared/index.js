@@ -4,15 +4,38 @@ window.addEventListener('DOMContentLoaded', async function () {
     // Connect to database
     var realtimedb = firebase.database();
 
+    // Storage for thumbnails
+    var storageRef = firebase.storage().ref();
+
+    /* For reference
+    async function saveModelTheNewWay(id, completeModel) {
+        var modelmeta = { lastmodified: Date.now(), complete: true };
+        var modeldetail = {
+            colorpalette: completeModel.colorpalette,
+            pos: completeModel.pos,
+            scene: completeModel.scene,
+            target: completeModel.target,
+        };
+        var modelthumbnail = completeModel.thumbnail;
+        realtimedb.ref('modelmetas/' + id).set(modelmeta);
+        realtimedb.ref('modeldetails/' + id).set(modeldetail);
+        var fileRef = storageRef.child('modelthumbnails/' + id + '.jpg');
+        await fileRef.putString(modelthumbnail, 'data_url');
+        console.log(completeModel, modelmeta, modeldetail, modelthumbnail);
+    }
+    */
+
     // Prepare models
     var localModels = await LocalDb.listModels();
     try {
         // Fetch all models from database
+        // TODO: Auf modelmetas, modeldetails und storage umschwenken
         var realtimeresult = await realtimedb.ref('/models/').once('value');
         // Save models in local database
         realtimeresult.forEach(function (element) {
             var modelFromServer = element.val();
             var modelId = element.key;
+            //saveModelTheNewWay(modelId, modelFromServer);
             modelFromServer._id = modelId; // For local storage
             var localModelIndex = localModels.findIndex(function (m) { return m._id === modelId });
             if (localModelIndex < 0) {
