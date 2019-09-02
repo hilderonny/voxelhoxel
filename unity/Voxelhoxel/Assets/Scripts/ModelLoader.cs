@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Todo. dEPRECATED
+
+/*
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase;
@@ -83,7 +86,6 @@ public class ModelLoader : MonoBehaviour
             }
         }
         dz += 10;
-        */
     }
 
     private void ModelLoader_ValueChanged(object sender, ValueChangedEventArgs e)
@@ -117,7 +119,6 @@ public class ModelLoader : MonoBehaviour
             dz -= 10;
             //return; // After first model
         }
-        */
     }
 
     private List<Material> CreateMaterials(DataSnapshot palette) {
@@ -134,7 +135,6 @@ public class ModelLoader : MonoBehaviour
             materials.Add(material);
         }
         Debug.Log(materials);
-        */
         return materials;
     }
 
@@ -186,7 +186,6 @@ public class ModelLoader : MonoBehaviour
         gameObject.GetComponent<Renderer>().material = material;
         //gameObject.transform.parent = GetComponent<GameObject>().transform;
         gameObject.transform.Translate(x, y, z);
-        */
     }
 
     // Update is called once per frame
@@ -195,3 +194,4 @@ public class ModelLoader : MonoBehaviour
         
     }
 }
+*/

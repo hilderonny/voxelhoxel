@@ -53,7 +53,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Model.cs" />
+     <Compile Include="Assets\Scripts\ModelList.cs" />
+     <Compile Include="Assets\Scripts\ModelListItem.cs" />
      <Compile Include="Assets\Scripts\ModelLoader.cs" />
      <Compile Include="Assets\Scripts\OrbitControls.cs" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
@@ -62,31 +65,31 @@
      <None Include="Assets\Firebase\Plugins\Http\link.xml" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.1f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -266,31 +269,31 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.1f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.App">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Auth">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Auth.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Auth.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Database">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Database.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Database.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.Platform">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
  </Reference>
  <Reference Include="Firebase.TaskExtension">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
  </Reference>
  <Reference Include="Google.MiniJson">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
  </Reference>
  <Reference Include="Google.Sharpen">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Google.Sharpen.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Firebase/Plugins/Google.Sharpen.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Compat">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Parse/Plugins/dotNet45/Unity.Compat.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Parse/Plugins/dotNet45/Unity.Compat.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Tasks">
- <HintPath>C:/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Parse/Plugins/dotNet45/Unity.Tasks.dll</HintPath>
+ <HintPath>D:/Ronny/gitlab/levelupsoftware/voxelhoxel/unity/Voxelhoxel/Assets/Parse/Plugins/dotNet45/Unity.Tasks.dll</HintPath>
  </Reference>
  <Reference Include="netstandard">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.1f1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
