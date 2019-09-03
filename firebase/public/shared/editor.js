@@ -33,7 +33,16 @@ const Editor = (function () {
         var color = model.colorpalette[paletteNumber];
         var standardMaterial = standardMaterials[color];
         if (!standardMaterial) {
-            standardMaterial = new THREE.MeshLambertMaterial({ color: color });
+            if (color.length > 7) {
+                // Color enthält URL für Textur, z.B. https://i.imgur.com/iy50ZFn.png
+                // Meine Bilder liegen bei https://hilderonny.imgur.com/all/?third_party=1
+                var texture = new THREE.TextureLoader().load(color);
+                texture.magFilter = THREE.NearestFilter;
+                texture.minFilter = THREE.LinearMipMapLinearFilter;
+                standardMaterial = new THREE.MeshLambertMaterial( { map: texture } );
+            } else {
+                standardMaterial = new THREE.MeshLambertMaterial({ color: color });
+            }
             standardMaterials[color] = standardMaterial;
         }
         mesh.numbersMaterial = numberMaterials[paletteNumber];
@@ -257,7 +266,11 @@ const Editor = (function () {
         });
         var html = '';
         model.colorpalette.forEach(function (color, index) {
-            html += '<label' + (colorsLeft[index] ? '' : ' class="invisible"') + '><input type="radio" name="color" colorIndex="' + index + '" /><div style="background-color:' + color + '"><span class="unchecked">' + index + '</span><img class="checked" src="../images/checkmark.png"/></div></label>';
+            console.log(color);
+            var colorhtml = '<label' + (colorsLeft[index] ? '' : ' class="invisible"') + '><input type="radio" name="color" colorIndex="' + index + '" />';
+            colorhtml += color.length > 7 ? '<div style="background-image:url(' + color + ')">' : '<div style="background-color:' + color + '">';
+            colorhtml += '<span class="unchecked">' + index + '</span><img class="checked" src="../images/checkmark.png"/></div></label>';
+            html += colorhtml;
         });
         config.colorbar.innerHTML = html;
         config.colorbar.querySelectorAll('input').forEach(function (input) {
