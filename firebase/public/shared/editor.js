@@ -270,6 +270,7 @@ const Editor = (function () {
 
     function checkAllColors() {
         config.completion.classList.remove('complete');
+        if (!model.painted) model.painted = {};
         const painted = model.painted;
         Object.keys(painted).forEach(function (zKey) {
             const bz = painted[zKey];

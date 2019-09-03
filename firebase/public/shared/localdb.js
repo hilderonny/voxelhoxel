@@ -4,7 +4,7 @@ const LocalDb = (function() {
   const dbName = 'voxelhoxel', version = 1, modelCollection = 'models';
   
   function upgradeDb(db) {
-    db.createObjectStore(modelCollection, { keyPath: '_id' });
+    db.createObjectStore(modelCollection, { keyPath: '_id' }); // Require that models must have a property "_id"
   }
   
   function getDb() {
@@ -76,6 +76,7 @@ const LocalDb = (function() {
         const db = await getDb();
         var listEl = model.listEl; // HTML element cannot be stored
         delete model.listEl;
+        model.lastmodified = Date.now(); // Update last modified date
         const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).put(model);
         request.onerror = function() {
           model.listEl = listEl;
