@@ -9,9 +9,9 @@
 const Editor = (function () {
 
     var camera, controls, scene, renderer, currentMode, currentColorIndex, model, rollOverMesh, raycaster, mouse, objects = [], boxes = {}, previousIntersection, numberMaterials = [], isMoving, isBlocked, isPainting, config, colorsLeft;
-    const black = new THREE.Color(0x000000);
     var standardMaterials = {};
 
+    // Einzelne Seite eines Wuerfels erzeugen
     function createPlane(paletteNumber, material, position, rotation) {
         var geometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1);
         const mesh = new THREE.Mesh(geometry, material);
@@ -27,6 +27,7 @@ const Editor = (function () {
         return mesh;
     }
 
+    // Erzeugt einen Wuerfel. Erstellt aber nur die Seiten, die auch wirklich sichtbar sind
     function addBox(pos, paletteNumber) {
         var x = pos.x, y = pos.y, z = pos.z;
         var mesh = new THREE.Group();
@@ -91,14 +92,7 @@ const Editor = (function () {
         controls.target = intersects[0].point.clone();
     }
 
-    function animate() {
-        //requestAnimationFrame(animate);
-        renderer.setAnimationLoop(function () {
-            controls.update();
-            renderer.render(scene, camera);
-        });
-    }
-
+    // Erzeugt eine Textur mit einer gegebenen Nummer
     function createTextTexture(text) {
         const bitmap = document.createElement('canvas');
         bitmap.width = 128;
@@ -118,6 +112,7 @@ const Editor = (function () {
         return new THREE.MeshLambertMaterial({ map: texture });
     }
 
+    // Behandelt Beginn des Ausmalens oder das Rotieren beim Tippen oder Mausklick
     function handleMouseDown() {
         if (isBlocked) return;
         raycaster.setFromCamera(mouse, camera);
@@ -225,12 +220,6 @@ const Editor = (function () {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
-    }
-
-    function paintBox(mesh) {
-        model.scene[mesh.position.z][mesh.position.y][mesh.position.x] = currentColorIndex;
-        mesh.material.color.set(model.colorpalette[currentColorIndex]);
-        mesh.numbersMaterial = numberMaterials[currentColorIndex];
     }
 
     function playPaintBox(mesh) {
@@ -481,16 +470,6 @@ const Editor = (function () {
             });
         },
 
-        setCurrentColorEmissive: function (isEmissive) {
-            // For glow effect: https://stemkoski.github.io/Three.js/Simple-Glow.html
-            const currentColor = model.colorpalette[currentColorIndex];
-            objects.forEach(function (obj) {
-                if (obj.paletteNumber === currentColorIndex) {
-                    obj.standardMaterial.emissive.set(isEmissive ? currentColor : black);
-                }
-            });
-        },
-
         setMode: function (mode) {
             currentMode = mode;
             const isNumber = (mode === 'play');
@@ -505,7 +484,10 @@ const Editor = (function () {
 
         start: function () {
             onWindowResize(); // Let the canvas resize itself on startup
-            animate();
+            renderer.setAnimationLoop(function () {
+                controls.update();
+                renderer.render(scene, camera);
+            });
         }
 
     }
