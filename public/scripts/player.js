@@ -66,7 +66,7 @@ var Player = (function () {
             // Materialien vorbereiten
             createMaterials(model.colorpalette);
             // Würfel erstellen
-            var boxes = createBoxesForScene(model.scene);
+            var boxes = createBoxesForModel(model);
             // Würfel in Objektliste speichern und der Szene hinzufügen
             boxes.forEach(function(box) {
                 objects.push(box);
@@ -102,7 +102,9 @@ var Player = (function () {
     }
 
     // Erstellt eine Liste von ThreeJS Objekten aus der gegebenen Szene
-    function createBoxesForScene(scene) {
+    function createBoxesForModel(model) {
+        var scene = model.scene;
+        var painted = model.painted;
         var boxes = [];
         Object.keys(scene).forEach(function (zKey) {
             const bz = scene[zKey];
@@ -112,9 +114,12 @@ var Player = (function () {
                     var x = parseInt(xKey);
                     var y = parseInt(yKey);
                     var z = parseInt(zKey);
+                    // Je nachdem, ob der Würfel schon ausgemalt wurde, wird daas Platzhaltermaterial oder das richtige verwendet
+                    var isPainted = painted && painted[z] && painted[z][y] && painted[z][y][x];
+                    var paletteIndex = by[xKey];
                     // Würfel erzeugen, dabei die angrenzenden Würfel beachten, damit nur die sichtbaren Flächen erzeugt werden
                     boxes.push(createPlayBox(
-                        standardMaterials[by[xKey]],
+                        isPainted ? standardMaterials[paletteIndex] : numberMaterials[paletteIndex],
                         x,
                         y,
                         z,
