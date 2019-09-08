@@ -14,6 +14,10 @@
     background-color: #a37f81ff;
 }
 
+.progressspinner::after {
+    border-color: #a37f81 transparent;
+}
+
 .grid > li, #playpage .content {
     background-color: white;
 }

@@ -4,7 +4,9 @@ function addModelToList(model) {
     var el = document.createElement('li');
     el.innerHTML = '<img src="' + model.thumbnail + '" class="' + ((!model.painted || Object.keys(model.painted).length < 1) ? 'new' : '') + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
     el.addEventListener('click', function () {
+        el.classList.add('progressspinner');
         showPlayModel(model);
+        el.classList.remove('progressspinner');
     });
     // Beim Speichern wird eine Referenz auf das HTML Element benötigt, damit das Vorschaubild und der Status aktualisiert werden können.
     model.listEl = el;
@@ -29,6 +31,7 @@ async function getBase64ImageFromUrl(imageUrl) {
 }
 
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
+// Wird asynchron ausgeführt, weil das Laden eine Weile dauern kann
 function showPlayModel(model) {
     Player.loadModel(model);
     showPage('playpage');

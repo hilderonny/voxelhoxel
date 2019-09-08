@@ -67,6 +67,36 @@ body { position: relative; }
     animation: progressbar 2s linear infinite;
 }
 
+.progressspinner {
+    position: relative;
+}
+
+.progressspinner::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0px 0px 0px 999px #FFFFFFEE;
+    z-index: 1;
+}
+
+.progressspinner::after {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    left: 50%;
+    border: 4px solid;
+    border-radius: 30px;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    animation: progressspinner 1.2s linear infinite;
+    z-index: 2;
+}
+
 .grid {
     padding: 8px;
     text-align: center;
@@ -88,4 +118,9 @@ body { position: relative; }
     0% { left: -112px; width: 112px; }
     50% { width: 224px; }
     100% { left: 100%; width: 112px; }
+}
+
+@keyframes progressspinner {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
