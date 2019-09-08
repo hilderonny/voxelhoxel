@@ -1,11 +1,3 @@
-function showProgressBar() {
-    document.querySelector('.progressbar').classList.remove('invisible');
-}
-
-function hideProgressBar() {
-    document.querySelector('.progressbar').classList.add('invisible');
-}
-
 // Fügt das Bild eines Modells in die Liste ein und verlinkt es mit der Detailansicht.
 function addModelToList(model) {
     var list = document.querySelector('#listpage .grid');
@@ -34,4 +26,31 @@ async function getBase64ImageFromUrl(imageUrl) {
         };
         reader.readAsDataURL(blob);
     })
+}
+
+// Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
+function showPlayModel(model) {
+    // TODO: Modell laden
+    showPage('playpage');
+}
+
+// Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
+function goBack() {
+    hidePage('playpage');
+}
+
+function showPage(pageId) {
+    document.getElementById(pageId).classList.remove('invisible');
+}
+
+function hidePage(pageId) {
+    document.getElementById(pageId).classList.add('invisible');
+}
+
+function showProgressBar() {
+    document.querySelector('.progressbar').classList.remove('invisible');
+}
+
+function hideProgressBar() {
+    document.querySelector('.progressbar').classList.add('invisible');
 }
