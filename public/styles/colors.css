@@ -1,0 +1,35 @@
+.page > .header, .fab {
+    background-color: #a37f81;
+}
+
+.progressbar {
+    background-color: #a37f8199;
+}
+
+.content {
+    background-color: #d5aeb0;
+}
+
+.progressbar::after {
+    background-color: #a37f81ff;
+}
+
+.grid > li {
+    background-color: white;
+}
+
+h2, p {
+    color: #00000099;
+}
+
+h3, .footer > .info {
+    color: #0000008A;
+}
+
+.page > .header > .title {
+    color: black;
+}
+
+.page > .header > .back {
+    background-image: url(../icons/black/back.png);
+}

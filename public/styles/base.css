@@ -1,0 +1,91 @@
+* { margin:0; padding: 0; font-family: Roboto, Helvetica, Arial, sans-serif; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+button, .grid > li { cursor: pointer; }
+button:focus { outline: 0; }
+
+body { position: relative; }
+
+.page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    transition: left .2s;
+}
+
+.page.invisible {
+    left: 100%;
+}
+
+/* https://www.material.io/components/app-bars-top/#specs */
+.page > .header {
+    display: flex;
+    height: 56px;
+    padding: 0 16px;
+    align-items: center;
+}
+
+.page > .header > button {
+    width: 24px;
+    height: 24px;
+    background: transparent center no-repeat;
+    border: none;
+}
+
+.page > .header > .back {
+    margin-right: 32px;
+}
+
+.page > .header > .title {
+    flex: 1;
+    font-size: 20px;
+}
+
+.page > .content {
+    flex: 1;
+    overflow: auto;
+}
+
+.progressbar {
+    height: 4px;
+    position: relative;
+}
+
+.progressbar.invisible {
+    display: none;
+}
+
+.progressbar::after {
+    content: "";
+    position: absolute;
+    width: 112px;
+    height: 4px;
+    left: 0;
+    top: 0;
+    animation: progressbar 2s linear infinite;
+}
+
+.grid {
+    padding: 8px;
+    text-align: center;
+}
+
+.grid > li {
+    margin: 16px;
+    display: inline-block;
+    list-style-type: none;
+    width: 272px;
+    height: 272px;
+    border-radius: 4px;
+    box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes progressbar {
+    0% { left: -112px; width: 112px; }
+    50% { width: 224px; }
+    100% { left: 100%; width: 112px; }
+}
