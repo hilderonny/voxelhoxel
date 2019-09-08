@@ -1,0 +1,6 @@
+#listpage .grid > li { position: relative; }
+#listpage .grid > li > span.new {display: none;position: absolute;top: 0;right: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 0 4px;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+#listpage .grid > li > span.complete {display: none;position: absolute;top: 0;left: 0;color: #fff;background-color: #0c0;padding: 4px 12px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+#listpage .grid > li > img.complete~span.complete {display: block; }
+#listpage .grid > li > img.new { filter:grayscale(100%); }
+#listpage .grid > li > img.new~span.new {display: block; }
