@@ -14,7 +14,7 @@
     background-color: #a37f81ff;
 }
 
-.grid > li {
+.grid > li, #playpage .content {
     background-color: white;
 }
 

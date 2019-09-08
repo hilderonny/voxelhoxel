@@ -2,7 +2,6 @@ window.addEventListener('load', function () {
 
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     LocalDb.listModels().then(function (localModels) {
-        console.log(localModels);
         // Erst mal alle lokalen Modelle anzeigen
         localModels.forEach(function(localModel) {
             addModelToList(localModel);
@@ -61,5 +60,8 @@ window.addEventListener('load', function () {
             hideProgressBar();
         });
     });
+
+    // Player initialisieren. Der wird in allen Modellansichten wiederverwendet
+    Player.init(document.querySelector('#playpage .canvas'));
 
 });

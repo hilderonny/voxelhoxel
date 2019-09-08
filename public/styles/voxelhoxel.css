@@ -4,3 +4,6 @@
 #listpage .grid > li > img.complete~span.complete {display: block; }
 #listpage .grid > li > img.new { filter:grayscale(100%); }
 #listpage .grid > li > img.new~span.new {display: block; }
+
+#playpage .content { display: flex; position: relative; flex-direction: column; }
+#playpage .canvas { flex: 1; }
