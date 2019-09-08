@@ -7,3 +7,6 @@
 
 #playpage .content { display: flex; position: relative; flex-direction: column; }
 #playpage .canvas { flex: 1; }
+
+#playpage .toolbar { display: flex; }
+#playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; }

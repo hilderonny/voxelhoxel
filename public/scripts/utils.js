@@ -42,6 +42,9 @@ function goBack() {
     hidePage('playpage');
 }
 
+function resetModel() {
+    console.log('CLEAR');
+}
 
 // Erzeugt einen Würfel an einer bestimmten Position mittels einzelner Flächen
 // Dabei wird angegeben, ob bestimmte Flächen erszeugt werden sollen, oder nicht
