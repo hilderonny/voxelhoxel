@@ -25,6 +25,7 @@ body { position: relative; }
     height: 56px;
     padding: 0 16px;
     align-items: center;
+    background-color: #a37f81;
 }
 
 .page > .header > button {
@@ -36,21 +37,25 @@ body { position: relative; }
 
 .page > .header > .back {
     margin-right: 32px;
+    background-image: url(../icons/black/back.png);
 }
 
 .page > .header > .title {
     flex: 1;
     font-size: 20px;
+    color: black;
 }
 
 .page > .content {
     flex: 1;
     overflow: auto;
+    background-color: #d5aeb0;
 }
 
 .progressbar {
     height: 4px;
     position: relative;
+    background-color: #a37f8199;
 }
 
 .progressbar.invisible {
@@ -65,6 +70,7 @@ body { position: relative; }
     left: 0;
     top: 0;
     animation: progressbar 2s linear infinite;
+    background-color: #a37f81ff;
 }
 
 .progressspinner {
@@ -95,6 +101,7 @@ body { position: relative; }
     border-bottom-color: transparent;
     animation: progressspinner 1.2s linear infinite;
     z-index: 2;
+    border-color: #a37f81 transparent;
 }
 
 .grid {
@@ -112,6 +119,7 @@ body { position: relative; }
     box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14),
     0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+    background-color: white;
 }
 
 @keyframes progressbar {
@@ -124,3 +132,16 @@ body { position: relative; }
     0% { transform: translate(-50%, -50%) rotate(0deg); }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
+
+#listpage .grid > li { position: relative; }
+#listpage .grid > li > span.new {display: none;position: absolute;top: 0;right: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 0 4px;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+#listpage .grid > li > span.complete {display: none;position: absolute;top: 0;left: 0;color: #fff;background-color: #0c0;padding: 4px 12px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+#listpage .grid > li > img.complete~span.complete {display: block; }
+#listpage .grid > li > img.new { filter:grayscale(100%); }
+#listpage .grid > li > img.new~span.new {display: block; }
+
+#playpage .content { display: flex; position: relative; flex-direction: column; background-color: white; }
+#playpage .canvas { flex: 1; }
+
+#playpage .toolbar { display: flex; }
+#playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; }
