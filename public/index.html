@@ -1,0 +1,61 @@
+<html>
+
+<head>
+    <!-- PWA Einstellungen -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Voxelhoxel">
+    <meta name="description" content="Malen nach Zahlen">
+    <meta name="theme-color" content="#8bb7f0" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Framework Zeugs -->
+    <script defer src="scripts/utils.js"></script>
+
+    <!-- Anwendungsspezifische Stile und Funktionen -->
+    <title>Voxelhoxel</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script defer src="scripts/app.js"></script>
+    <script src="scripts/three.js"></script>
+    <script src="scripts/three.orbitcontrols.js"></script>
+    <script src="scripts/localdb.js"></script>
+    <script src="scripts/player.js"></script>
+</head>
+
+<body>
+
+    <div class="page" id="listpage">
+        <div class="header">
+            <div class="title">Voxelhoxel</div>
+        </div>
+        <div class="progressbar invisible"></div>
+        <div class="content">
+            <ul class="grid"></ul>
+        </div>
+    </div>
+
+    <div class="page invisible" id="playpage">
+        <div class="header">
+            <button class="back" onclick="goBack();"></button>
+        </div>
+        <div class="content">
+            <div class="canvas"></div>
+            <div class="complete"></div>
+            <div class="colorcounter"></div>
+            <div class="toolbar">
+                <button class="icon" onclick="resetModel();">&#x1f4a3;</button>
+                <!-- https://www.fileformat.info/info/unicode/char/1f4a3/browsertest.htm -->
+            </div>
+            <div class="colorbar"></div>
+        </div>
+    </div>
+
+</body>
+
+</html>
