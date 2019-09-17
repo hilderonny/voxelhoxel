@@ -200,7 +200,6 @@ var Player = (function () {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
-        document.title = width + ' ' + height;
     }
 
     // Bereitet anhand der Palette die Standard- und Platzhaltermatierialien vor
