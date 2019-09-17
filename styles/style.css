@@ -29,15 +29,15 @@ body { position: relative; }
 }
 
 .page > .header > button {
-    width: 24px;
-    height: 24px;
+    width: 48px;
+    height: 48px;
     background: transparent center no-repeat;
     border: none;
 }
 
 .page > .header > .back {
     margin-right: 32px;
-    background-image: url(../icons/black/back.png);
+    background-image: url(../icons/back.png);
 }
 
 .page > .header > .title {
@@ -144,4 +144,6 @@ body { position: relative; }
 #playpage .canvas { flex: 1; }
 
 #playpage .toolbar { display: flex; }
-#playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; }
+#playpage .toolbar .spacer { flex: 1; }
+#playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; width:48px; height: 48px; margin: 4px; }
+#playpage .toolbar .icon.clear { background-image:url(../icons/clear.png);}
