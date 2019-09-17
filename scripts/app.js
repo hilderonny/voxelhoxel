@@ -64,28 +64,38 @@ function addModelToList(model) {
     list.appendChild(el);
 }
 
-// Von https://staxmanade.com/2017/02/how-to-download-and-convert-an-image-to-base64-data-url/
-// Blob in Base64 Zeichenkette umwandelt
-async function getBase64ImageFromUrl(imageUrl) {
-    var res = await fetch(imageUrl);
-    var blob = await res.blob();
-    return new Promise((resolve, reject) => {
-        var reader = new FileReader();
-        reader.addEventListener("load", function () {
-            resolve(reader.result);
-        }, false);
-        reader.onerror = () => {
-            return reject(this);
-        };
-        reader.readAsDataURL(blob);
-    })
-}
-
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
 // Wird asynchron ausgeführt, weil das Laden eine Weile dauern kann
 function showPlayModel(model) {
     Player.loadModel(model);
+    // Farbpalette erstellen
+    setupColorBar(model);
     UTILS.showElement('#playpage');
+}
+
+// Füllt die Farbpalette mit den gegebenen Farben und Texturen
+// Wenn die Farbe länger als 9 Zeichen ist, wird sie als Textur-URL interpretiert
+// Es werden nur die Farben angezeigt, die auch verwendet werden
+// Hier gehört auch der Farbzähler dazu
+function setupColorBar(model) {
+    // Farben zählen
+    var colorsUsed = {};
+    Object.values(model.scene).forEach(function(z) {
+        Object.values(z).forEach(function(y) {
+            Object.values(y).forEach(function(paletteIndex) {
+                colorsUsed[paletteIndex] = colorsUsed[paletteIndex] ? colorsUsed[paletteIndex] + 1 : 1;
+            });
+        });
+    });
+    var colorbar = document.querySelector('#playpage .content .colorbar');
+    colorbar.innerHTML = '';
+    model.colorpalette.forEach(function(colorOrUrl, index) {
+        if (!colorsUsed[index]) return;
+        var label = document.createElement('label');
+        label.innerHTML = '<input type="radio" name="colorbarinput" value="' + index + '"/><span>' + (index + 1) + '</span>';
+        label.style.background = colorOrUrl.length > 9 ? 'url(' + colorOrUrl + ')' : colorOrUrl;
+        colorbar.appendChild(label);
+    });
 }
 
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
@@ -99,7 +109,7 @@ function resetModel() {
 
 // Erzeugt ein Material mit einer Farbe (wenn als Hex gegeben) oder einer Bildtexture (wenn URL angegeben)
 function createStandardMaterial(hexColorOrUrl) {
-    if (hexColorOrUrl.length > 7) {
+    if (hexColorOrUrl.length > 9) { // Hexadezimal mit Transparenz
         // Parameter enthält URL für Textur, z.B. https://i.imgur.com/iy50ZFn.png
         // Meine Bilder liegen bei https://hilderonny.imgur.com/all/?third_party=1
         var texture = new THREE.TextureLoader().load(hexColorOrUrl);

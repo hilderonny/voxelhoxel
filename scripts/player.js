@@ -170,12 +170,11 @@ var Player = (function () {
         // Erst mal leer machen
         standardMaterials = [];
         numberMaterials = [];
-        Object.keys(palette).forEach(function (key) {
-            var paletteEntry = palette[key];
+        palette.forEach(function (paletteEntry, index) {
             // Standardmaterial erzeugen
-            standardMaterials[key] = createStandardMaterial(paletteEntry);
+            standardMaterials[index] = createStandardMaterial(paletteEntry);
             // Platzhaltermaterial erzeugen
-            numberMaterials[key] = createNumberMaterial(key);
+            numberMaterials[index] = createNumberMaterial(index + 1);
         });
     }
 

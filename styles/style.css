@@ -143,7 +143,31 @@ body { position: relative; }
 #playpage .content { display: flex; position: relative; flex-direction: column; background-color: white; }
 #playpage .canvas { flex: 1; }
 
-#playpage .toolbar { display: flex; }
+#playpage .toolbar { display: flex; height:56px; }
 #playpage .toolbar .spacer { flex: 1; }
 #playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; width:48px; height: 48px; margin: 4px; }
 #playpage .toolbar .icon.clear { background-image:url(../icons/clear.png);}
+
+#playpage .colorbar { display: flex; height:56px; user-select: none; }
+#playpage .colorbar label {
+    display: block;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    margin: 4px;
+    text-align: center;
+    line-height: 48px;
+    font-size: 32px;
+    border-radius: 24px;
+    text-shadow: 0px 0px 3px white;
+}
+#playpage .colorbar label input { display: none; position: relative; }
+#playpage .colorbar label input:checked + span {
+    display: block;
+    width: 44px;
+    height: 44px;
+    box-shadow: inset 0 0 2px 3px #eee;
+    border-radius: 24px;
+    margin: 2px;
+    line-height: 44px;
+}
