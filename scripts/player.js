@@ -109,6 +109,7 @@ var Player = (function () {
                 const box = intersects[0].object.parent;
                 if (!box.userData.isPainted && box.userData.paletteIndex === currentColor) {
                     isPainting = true; // Wir beginnen zu malen
+                    paintBox(box);
                 } else {
                     isMoving = true; // Wenn wir auf einen Würfel klicken, der schon ausgemalt ist, bewegen wir das Objekt
                 }
@@ -270,12 +271,14 @@ var Player = (function () {
     function paintBox(box) {
         // Box nur dann ausmalen, wenn die nicht schon gemalt wurde oder die falsche Farbe hat
         if (box.userData.isPainted ||  box.userData.paletteIndex !== currentColor) return;
-        var standardMaterial = standardMaterials[box.userData.paletteIndex];
+        var standardMaterial = standardMaterials[currentColor];
         // Über alle Flächen des Würfels gehen und deren Material setzen
         box.children.forEach(function(plane) {
             plane.material = standardMaterial;
         });
         box.userData.isPainted = true; // Box als gemalt markieren
+        // Anwendung benachrichtigen, damit sie die übrigen Farben zählen kann
+        if (Player.onBoxPainted) Player.onBoxPainted(currentColor);
     }
 
 })();

@@ -171,3 +171,26 @@ body { position: relative; }
     margin: 2px;
     line-height: 44px;
 }
+
+#playpage .colorbar label.complete {
+    background-image: url(../icons/checkmark.png) !important;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+#playpage .colorbar label.complete span {
+    color: transparent;
+    text-shadow: none;
+}
+
+#playpage .content > .complete {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: center no-repeat url(../icons/checkmark.png) #00cc00;
+}
+
+#playpage .content > .complete.invisible {
+    display: none;
+}

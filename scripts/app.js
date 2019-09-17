@@ -89,6 +89,7 @@ function setupColorBar(model) {
     });
     var colorbar = document.querySelector('#playpage .content .colorbar');
     colorbar.innerHTML = '';
+    var labels = {};
     model.colorpalette.forEach(function(colorOrUrl, index) {
         if (!colorsUsed[index]) return;
         var label = document.createElement('label');
@@ -97,9 +98,26 @@ function setupColorBar(model) {
             var paletteIndex = parseInt(evt.target.value);
             Player.selectColor(paletteIndex);
         });
-        label.style.background = colorOrUrl.length > 9 ? 'url(' + colorOrUrl + ')' : colorOrUrl;
+        if (colorOrUrl.length < 10) {
+            label.style.backgroundColor = colorOrUrl;
+        } else {
+            label.style.backgroundImage = 'url(' + colorOrUrl + ')';
+        }
         colorbar.appendChild(label);
+        labels[index] = label;
     });
+    var colorCount = Object.values(colorsUsed).reduce(function(a, b) { return a + b; });
+    // Event handler für ausgemalte Boxen zum runterzählen
+    Player.onBoxPainted = function(paletteIndex) {
+        colorsUsed[paletteIndex]--;
+        colorCount--;
+        if (colorsUsed[paletteIndex] < 1) {
+            labels[paletteIndex].classList.add('complete');
+        }
+        if (colorCount < 1) {
+            document.querySelector('#playpage .content > .complete').classList.remove('invisible');
+        }
+    }
 }
 
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
