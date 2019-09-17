@@ -3,10 +3,6 @@ window.addEventListener('load', function () {
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     // Das wird bewusst mit then() ausgeführt, damit weiter unten während des Ladens die Liste bereits angezeigt werden kann
     LocalDb.listModels().then(async function (localModels) {
-        // Erst mal alle lokalen Modelle anzeigen
-        localModels.forEach(function(localModel) {
-            addModelToList(localModel);
-        });
         // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
         UTILS.showElement('.progressbar');
         // Erst mal die Metadaten aus der models.json holen. Id und Zeitpunkt der letzten Änderung
@@ -24,7 +20,6 @@ window.addEventListener('load', function () {
                     var localModel = localModels[localModelIndex];
                     // Wenn das lokale Modell genauso alt ist oder bereits daran gemalt wurde, soll das lokale genommen werden
                     if ((localModel.painted && localModel.painted.length > 0) || (localModel.lastmodified >= modelmeta.lastmodified)) {
-                        // When the local model is already painted, or local model is newer, ignore the server model
                         continue;
                     }
                 }
@@ -40,9 +35,11 @@ window.addEventListener('load', function () {
                 // Es ist noch nicht in der lokalen Datenbank, also speichern wir es dort rein.
                 await LocalDb.saveModel(model);
                 localModels.push(model);
-                // Now model is ready to be shown in list
-                addModelToList(model);
             }
+            // Alle Modelle sortiert nach letztem Änderungsdatum anzeigen
+            localModels.sort(function(a, b) { return a.lastmodified > b.lastmodified ? 1 : -1; }).forEach(function(localModel) {
+                addModelToList(localModel);
+            });
             UTILS.hideElement('.progressbar');
         });
     });
@@ -98,42 +95,6 @@ function goBack() {
 
 function resetModel() {
     console.log('CLEAR');
-}
-
-// Erzeugt einen Würfel an einer bestimmten Position mittels einzelner Flächen
-// Dabei wird angegeben, ob bestimmte Flächen erszeugt werden sollen, oder nicht
-// Wird für Play Modus verwendet
-function createPlayBox(standardMaterial, x, y, z, top, bottom, left, right, front, back) {
-    var boxMesh = new THREE.Group();
-    // Nur die Flächen erzeugen, die auch wirklich sichtbar sind
-    if (top) boxMesh.add(createPlane(standardMaterial, [0, .5, 0], [-1.5708, 0, 0]));
-    if (bottom) boxMesh.add(createPlane(standardMaterial, [0, -.5, 0], [1.5708, 0, 0]));
-    if (left) boxMesh.add(createPlane(standardMaterial, [-.5, 0, 0], [0, -1.5708, 0]));
-    if (right) boxMesh.add(createPlane(standardMaterial, [.5, 0, 0], [0, 1.5708, 0]));
-    if (front) boxMesh.add(createPlane(standardMaterial, [0, 0, .5], [0, 0, 0]));
-    if (back) boxMesh.add(createPlane(standardMaterial, [0, 0, -.5], [0, 3.14159, 0]));
-    // Würfel positionieren
-    boxMesh.position.x = x;
-    boxMesh.position.y = y;
-    boxMesh.position.z = z;
-    boxMesh.updateMatrix();
-    boxMesh.matrixAutoUpdate = false;
-    return boxMesh;
-}
-
-// Erzeugt eine einzelne Fläche für einen Würfel
-function createPlane(material, position, rotation) {
-    var geometry = new THREE.PlaneBufferGeometry(1, 1, 1, 1);
-    var planeMesh = new THREE.Mesh(geometry, material);
-    planeMesh.position.x = position[0];
-    planeMesh.position.y = position[1];
-    planeMesh.position.z = position[2];
-    if (rotation[0]) planeMesh.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 0), rotation[0]);
-    if (rotation[1]) planeMesh.setRotationFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation[1]);
-    if (rotation[2]) planeMesh.setRotationFromAxisAngle(new THREE.Vector3(0, 0, 1), rotation[2]);
-    planeMesh.updateMatrix();
-    planeMesh.matrixAutoUpdate = false;
-    return planeMesh;
 }
 
 // Erzeugt ein Material mit einer Farbe (wenn als Hex gegeben) oder einer Bildtexture (wenn URL angegeben)
