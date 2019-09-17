@@ -80,6 +80,9 @@ var Player = (function () {
             // Kameraposition und -ausrichtung für Modell festlegen
             camera.position.set(model.pos.x, model.pos.y, model.pos.z);
             controls.target.set(model.target.x, model.target.y, model.target.z);
+            // Kameraposition und Ziel an Modell binden, damit es auch gespeichert wird
+            model.pos = camera.position;
+            model.target = controls.target;
         },
 
         // Legt eine Farbe als diejenige fest, die ausgemalt wird.
@@ -91,7 +94,27 @@ var Player = (function () {
                 numberMaterial.color.setHex(index === paletteIndex ? 0x666666 : 0xFFFFFF);
                 numberMaterial.emissive.setHex(index === paletteIndex ? 0x0000FF : 0x000000);
             });
-        }
+        },
+
+        // Macht ein Foto der aktuellen Ansicht
+        makeScreenshot: function () {
+            var canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            var tempRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true });
+            tempRenderer.setSize(256, 256);
+            var oldAspect = camera.aspect;
+            camera.aspect = 1;
+            camera.updateProjectionMatrix();
+            var oldBackground = threeScene.background;
+            threeScene.background = new THREE.Color(0xFFFFFF);
+            tempRenderer.render(threeScene, camera);
+            var data = tempRenderer.domElement.toDataURL('image/jpeg');
+            camera.aspect = oldAspect;
+            camera.updateProjectionMatrix();
+            threeScene.background = oldBackground;
+            return data;
+        },
     }
 
     // Registriert Event Listener für Maus und Touch-Eingaben.
@@ -221,9 +244,15 @@ var Player = (function () {
                     );
                     // Metainformationen an Würfel speichern, wird für das Malen benötigt
                     box.userData = {
-                        paletteIndex: paletteIndex
-                    }
+                        x: x,
+                        y: y,
+                        z: z,
+                        paletteIndex: paletteIndex,
+                        isPainted: isPainted
+                    };
                     boxes.push(box);
+                    // Wenn die Box bereits gemalt ist, die App informieren
+                    if (isPainted && Player.onBoxPainted) Player.onBoxPainted(box);
                 });
             });
         });
@@ -278,7 +307,7 @@ var Player = (function () {
         });
         box.userData.isPainted = true; // Box als gemalt markieren
         // Anwendung benachrichtigen, damit sie die übrigen Farben zählen kann
-        if (Player.onBoxPainted) Player.onBoxPainted(currentColor);
+        if (Player.onBoxPainted) Player.onBoxPainted(box);
     }
 
 })();

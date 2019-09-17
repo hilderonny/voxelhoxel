@@ -1,5 +1,7 @@
 window.addEventListener('load', function () {
 
+    var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
+
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     // Das wird bewusst mit then() ausgeführt, damit weiter unten während des Ladens die Liste bereits angezeigt werden kann
     LocalDb.listModels().then(async function (localModels) {
@@ -53,23 +55,25 @@ window.addEventListener('load', function () {
 function addModelToList(model) {
     var list = document.querySelector('#listpage .grid');
     var el = document.createElement('li');
+    el.setAttribute('id', 'model_' + model._id);
     el.innerHTML = '<img src="' + model.thumbnail + '" class="' + ((!model.painted || Object.keys(model.painted).length < 1) ? 'new' : '') + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
     el.addEventListener('click', function () {
         el.classList.add('progressspinner');
         showPlayModel(model);
         el.classList.remove('progressspinner');
     });
-    // Beim Speichern wird eine Referenz auf das HTML Element benötigt, damit das Vorschaubild und der Status aktualisiert werden können.
-    model.listEl = el;
     list.appendChild(el);
 }
 
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
 // Wird asynchron ausgeführt, weil das Laden eine Weile dauern kann
 function showPlayModel(model) {
-    Player.loadModel(model);
-    // Farbpalette erstellen
+    currentModel = model;
+    // Farbpalette erstellen, muss vor dem Modell erstellen geschehen, um die bereits gemalten Farben zu erkennen
     setupColorBar(model);
+    Player.loadModel(model);
+    // Erste Farbe selektieren
+    document.querySelector('#playpage .content .colorbar input').click();
     UTILS.showElement('#playpage');
 }
 
@@ -115,11 +119,20 @@ function setupColorBar(model) {
         colorbar.appendChild(label);
         labels[index] = label;
     });
-    // Erstes Element selektieren
-    colorbar.querySelector('input').click();
     var colorCount = Object.values(colorsUsed).reduce(function(a, b) { return a + b; });
     // Event handler für ausgemalte Boxen zum runterzählen
-    Player.onBoxPainted = function(paletteIndex) {
+    Player.onBoxPainted = function(box) {
+        // Modell aktualisieren
+        var userData = box.userData;
+        var x = userData.x;
+        var y = userData.y;
+        var z = userData.z;
+        if (!model.painted) model.painted = {};
+        if (!model.painted[z]) model.painted[z] = {};
+        if (!model.painted[z][y]) model.painted[z][y] = {};
+        model.painted[z][y][x] = 1; // 1 braucht weniger Speicherplatz als true
+        // Farben herunter zählen
+        var paletteIndex = userData.paletteIndex;
         colorsUsed[paletteIndex]--;
         colorCount--;
         var currentColorCount = colorsUsed[paletteIndex];
@@ -127,6 +140,7 @@ function setupColorBar(model) {
             labels[paletteIndex].classList.add('complete');
         }
         if (colorCount < 1) {
+            model.complete = true;
             document.querySelector('#playpage .content > .complete').classList.remove('invisible');
         }
         document.querySelector('#playpage .content > .colorcounter .number').innerHTML = currentColorCount;
@@ -134,7 +148,22 @@ function setupColorBar(model) {
 }
 
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
-function goBack() {
+async function goBack() {
+    // Speichern nur, wenn bereits gemalt wurde
+    if (currentModel.painted) {
+        // Thumbnail erstellen
+        currentModel.thumbnail = Player.makeScreenshot();
+        // Modell lokal speichern
+        await LocalDb.saveModel(currentModel);
+        // Thumbnail auf Liste aktualisieren
+        var imgTag = document.querySelector('#model_' + currentModel._id + ' img');
+        imgTag.setAttribute('src', currentModel.thumbnail);
+        imgTag.classList.remove('new'); // Gemalt ist halt nicht neu
+        // Vervollständigung in Liste anzeigen
+        if (currentModel.complete) imgTag.classList.add('complete');
+    }
+    // Spieleseite verbergen
+    currentModel = undefined;
     UTILS.hideElement('#playpage');
 }
 
