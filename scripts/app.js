@@ -82,6 +82,8 @@ function showPlayModel(model) {
 // Es werden nur die Farben angezeigt, die auch verwendet werden
 // Hier gehört auch der Farbzähler dazu
 function setupColorBar(model) {
+    // Vollständig Marker erst mal ausblenden
+    document.querySelector('#playpage .content > .complete').classList.add('invisible');
     // Farben zählen
     var colorsUsed = {};
     Object.values(model.scene).forEach(function(z) {
@@ -167,8 +169,17 @@ async function goBack() {
     UTILS.hideElement('#playpage');
 }
 
+// Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
 function resetModel() {
-    console.log('CLEAR');
+    if (!confirm('Soll das Modell wirklich geleert werden?')) return;
+    delete currentModel.painted;
+    delete currentModel.complete;
+    showPlayModel(currentModel); // Einfach neu laden
+    // Thumbnail auf Liste aktualisieren
+    currentModel.thumbnail = Player.makeScreenshot();
+    var imgTag = document.querySelector('#model_' + currentModel._id + ' img');
+    imgTag.setAttribute('src', currentModel.thumbnail);
+    imgTag.classList.remove('complete');
 }
 
 // Erzeugt ein Material mit einer Farbe (wenn als Hex gegeben) oder einer Bildtexture (wenn URL angegeben)
