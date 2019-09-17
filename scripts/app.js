@@ -93,6 +93,10 @@ function setupColorBar(model) {
         if (!colorsUsed[index]) return;
         var label = document.createElement('label');
         label.innerHTML = '<input type="radio" name="colorbarinput" value="' + index + '"/><span>' + (index + 1) + '</span>';
+        label.querySelector('input').addEventListener('change', function(evt) {
+            var paletteIndex = parseInt(evt.target.value);
+            Player.selectColor(paletteIndex);
+        });
         label.style.background = colorOrUrl.length > 9 ? 'url(' + colorOrUrl + ')' : colorOrUrl;
         colorbar.appendChild(label);
     });

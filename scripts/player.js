@@ -9,6 +9,7 @@ var Player = (function () {
     var controls; // Oribit Controls zum Festlegen der Initialien Ausrichtung
     var standardMaterials; // Ausgemalte Materialien mit Farben und Texturen
     var numberMaterials; // Zahlenmaterialien als Platzhalter für noch nicht ausgemalte Würfel
+    var currentColor; // Aktuell selektierte Palettennummer zum Ausmalen
 
     // Objekt zurück geben, welche irgendwelche Instanzmethoden bereit stellt.
     return {
@@ -79,6 +80,17 @@ var Player = (function () {
             // Kameraposition und -ausrichtung für Modell festlegen
             camera.position.set(model.pos.x, model.pos.y, model.pos.z);
             controls.target.set(model.target.x, model.target.y, model.target.z);
+        },
+
+        // Legt eine Farbe als diejenige fest, die ausgemalt wird.
+        // Die entsprechenden Würfel werden markiert und können ausgemalt werden
+        selectColor: function(paletteIndex) {
+            currentColor = paletteIndex;
+            // Vorschaumaterial farblich hervorheben, damit man erkennt, was man ausmalen muss
+            numberMaterials.forEach(function (numberMaterial, index) {
+                numberMaterial.color.setHex(index === paletteIndex ? 0x666666 : 0xFFFFFF);
+                numberMaterial.emissive.setHex(index === paletteIndex ? 0x0000FF : 0x000000);
+            });
         }
     }
 
@@ -95,7 +107,7 @@ var Player = (function () {
             const intersects = raycaster.intersectObjects(raycastablePlanes);
             if (intersects.length > 0) {
                 const box = intersects[0].object.parent;
-                if (!box.userData.isPainted/* && mesh.paletteNumber === currentColorIndex*/) {
+                if (!box.userData.isPainted && box.userData.paletteIndex === currentColor) {
                     isPainting = true; // Wir beginnen zu malen
                 } else {
                     isMoving = true; // Wenn wir auf einen Würfel klicken, der schon ausgemalt ist, bewegen wir das Objekt
@@ -125,25 +137,10 @@ var Player = (function () {
             var intersects = raycaster.intersectObjects(raycastablePlanes);
             // Wenn nichts angezielt wird, nix weiter tun
             if (intersects.length < 1) return;
-            var box = intersects[0].object.parent;
-            // Box nur dann ausmalen, wenn die nicht schon gemalt wurde
-            if (box.userData.isPainted) return;
-            paintBox(box);
-            box.userData.isPainted = true; // Box als gemalt markieren
-            /*
-            if (intersects.length > 0) {
-                if (currentMode === 'play' && isPainting) {
-                    playPaintBox(intersects[0].object);
-                }
-            } else {
-                if (rollOverMesh.visible) scene.remove(rollOverMesh);
-                rollOverMesh.visible = false;
-                if (previousIntersection) previousIntersection.material.emissive.setHex(0x000000);
-            }
-            */
+            paintBox(intersects[0].object.parent);
         }, false);
         renderer.domElement.addEventListener('mouseup', function () { handleUp(); }, false);
-        renderer.domElement.addEventListener('touchend', function () { }, false);
+        renderer.domElement.addEventListener('touchend', function () { handleUp(); }, false);
         renderer.domElement.addEventListener('mousedown', function () {
             event.preventDefault();
             mousePosition.set(
@@ -152,8 +149,22 @@ var Player = (function () {
             );
             handleDown();
         }, false);
-        renderer.domElement.addEventListener('touchstart', function () { }, false);
-        renderer.domElement.addEventListener('touchmove', function () { }, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
+        renderer.domElement.addEventListener('touchstart', function () {
+            var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
+            var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
+            mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
+            handleDown();
+        }, false);
+        renderer.domElement.addEventListener('touchmove', function () {
+            if (!isPainting) return;
+            var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
+            var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
+            mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
+            raycaster.setFromCamera(mousePosition, camera);
+            const intersects = raycaster.intersectObjects(raycastablePlanes);
+            if (intersects.length < 1) return;
+            paintBox(intersects[0].object.parent);
+        }, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
     }
 
     // Berechnet die Projektsionsmatrix und das Screen-Verhältnis neu, wenn sich die Fenstergröße ändert
@@ -257,11 +268,14 @@ var Player = (function () {
 
     // Malt einen Würfel aus, indem sein Standardmaterial gesetzt wird
     function paintBox(box) {
+        // Box nur dann ausmalen, wenn die nicht schon gemalt wurde oder die falsche Farbe hat
+        if (box.userData.isPainted ||  box.userData.paletteIndex !== currentColor) return;
         var standardMaterial = standardMaterials[box.userData.paletteIndex];
         // Über alle Flächen des Würfels gehen und deren Material setzen
         box.children.forEach(function(plane) {
             plane.material = standardMaterial;
         });
+        box.userData.isPainted = true; // Box als gemalt markieren
     }
 
 })();
