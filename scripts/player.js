@@ -47,6 +47,7 @@ var Player = (function () {
             threeScene.add(camera);
             // Event Listener für Fenstergröße, Maus und Touch registrieren
             window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener("orientationchange", onWindowResize, false);
             registerInputListener();
             // Renderer in DOM einfügen
             targetElement.appendChild(renderer.domElement);
@@ -193,11 +194,13 @@ var Player = (function () {
 
     // Berechnet die Projektsionsmatrix und das Screen-Verhältnis neu, wenn sich die Fenstergröße ändert
     function onWindowResize() {
-        const width = renderer.domElement.parentNode.clientWidth;
-        const height = renderer.domElement.parentNode.clientHeight;
+        renderer.setSize(100, 100); // Nur so wird die Größe des übergeordneten Elements richtig brechnet
+        const width = renderer.domElement.parentNode.offsetWidth;
+        const height = renderer.domElement.parentNode.offsetHeight;
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
+        document.title = width + ' ' + height;
     }
 
     // Bereitet anhand der Palette die Standard- und Platzhaltermatierialien vor

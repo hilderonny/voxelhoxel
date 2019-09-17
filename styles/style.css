@@ -148,10 +148,11 @@ body { position: relative; }
 #playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; width:48px; height: 48px; margin: 4px; }
 #playpage .toolbar .icon.clear { background-image:url(../icons/clear.png);}
 
-#playpage .colorbar { display: flex; height:56px; user-select: none; }
+#playpage .colorbar { display: flex; height:56px; user-select: none; overflow-x: auto; }
 #playpage .colorbar label {
     display: block;
     width: 48px;
+    min-width: 48px;
     height: 48px;
     cursor: pointer;
     margin: 4px;
