@@ -97,6 +97,15 @@ function setupColorBar(model) {
         label.querySelector('input').addEventListener('change', function(evt) {
             var paletteIndex = parseInt(evt.target.value);
             Player.selectColor(paletteIndex);
+            document.querySelector('#playpage .content > .colorcounter .number').innerHTML = colorsUsed[index];
+            var counterColorBubble = document.querySelector('#playpage .content > .colorcounter .color');
+            if (colorOrUrl.length < 10) {
+                counterColorBubble.style.backgroundImage = '';
+                counterColorBubble.style.backgroundColor = colorOrUrl;
+            } else {
+                counterColorBubble.style.backgroundColor = '';
+                counterColorBubble.style.backgroundImage = 'url(' + colorOrUrl + ')';
+            }
         });
         if (colorOrUrl.length < 10) {
             label.style.backgroundColor = colorOrUrl;
@@ -106,17 +115,21 @@ function setupColorBar(model) {
         colorbar.appendChild(label);
         labels[index] = label;
     });
+    // Erstes Element selektieren
+    colorbar.querySelector('input').click();
     var colorCount = Object.values(colorsUsed).reduce(function(a, b) { return a + b; });
     // Event handler für ausgemalte Boxen zum runterzählen
     Player.onBoxPainted = function(paletteIndex) {
         colorsUsed[paletteIndex]--;
         colorCount--;
-        if (colorsUsed[paletteIndex] < 1) {
+        var currentColorCount = colorsUsed[paletteIndex];
+        if (currentColorCount < 1) {
             labels[paletteIndex].classList.add('complete');
         }
         if (colorCount < 1) {
             document.querySelector('#playpage .content > .complete').classList.remove('invisible');
         }
+        document.querySelector('#playpage .content > .colorcounter .number').innerHTML = currentColorCount;
     }
 }
 
