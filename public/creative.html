@@ -1,0 +1,70 @@
+<html>
+
+<head>
+    <!-- PWA Einstellungen -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Voxelhoxel">
+    <meta name="description" content="Malen nach Zahlen">
+    <meta name="theme-color" content="#a37f81" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Framework Zeugs -->
+    <script defer src="scripts/utils.js"></script>
+
+    <!-- Anwendungsspezifische Stile und Funktionen -->
+    <title>Voxelhoxel Krativmodus</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script defer src="scripts/creative.js"></script>
+    <script defer src="scripts/three.min.js"></script>
+    <script defer src="scripts/three.orbitcontrols.js"></script>
+    <script defer src="scripts/editor.js"></script>
+</head>
+
+<body>
+
+    <div class="page" id="listpage">
+        <div class="header">
+            <div class="title">Voxelhoxel Kreativmodus</div>
+        </div>
+        <div class="progressbar invisible"></div>
+        <div class="content">
+            <ul class="grid"></ul>
+        </div>
+    </div>
+
+    <div class="page invisible" id="editpage">
+        <div class="header">
+            <button class="back" onclick="goBack();"></button>
+        </div>
+        <div class="content">
+            <div class="canvas"></div>
+            <div class="toolbar">
+                <label class="icon paintmode">
+                    <input type="radio" name="mode" onchange="Editor.setMode('paint');" /><span></span>
+                </label>
+                <label class="icon addmode">
+                    <input type="radio" name="mode" onchange="Editor.setMode('add');" /><span></span>
+                </label>
+                <label class="icon removemode">
+                    <input type="radio" name="mode" onchange="Editor.setMode('remove');" /><span></span>
+                </label>
+                <div class="spacer"></div>
+                <button class="icon save" onclick="save();"></button>
+                <button class="icon publish" onclick="publish();"></button>
+                <button class="icon duplicate" onclick="duplicate();"></button>
+                <button class="icon deleteModel" onclick="deleteModel();"></button>
+            </div>
+            <div class="colorbar"></div>
+        </div>
+    </div>
+
+</body>
+
+</html>

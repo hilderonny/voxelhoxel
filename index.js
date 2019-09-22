@@ -23,9 +23,17 @@ db.connect(function (err) {
 });
 
 // APIs
-// Modellinfos für Übersicht
+
+// Modellinfos der veröffentlichten Modelle für Übersicht im Spielemodus
 app.get('/api/modelinfos/published', function(req, res) {
     db.query('select * from modelinfos where published = 1 order by lastmodified desc', function (err, infos) {
+        res.send(infos);
+    });
+});
+
+// Modellinfos aller Modelle für Übersicht im Kreativmodus
+app.get('/api/modelinfos', function(req, res) {
+    db.query('select * from modelinfos order by lastmodified desc', function (err, infos) {
         res.send(infos);
     });
 });

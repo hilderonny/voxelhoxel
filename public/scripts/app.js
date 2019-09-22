@@ -7,7 +7,7 @@ window.addEventListener('load', function () {
     LocalDb.listModels().then(async function (localModels) {
         // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
         UTILS.showElement('.progressbar');
-        // Erst mal die Metadaten aus der models.json holen. Id und Zeitpunkt der letzten Änderung
+        // Erst mal die Metadaten holen, dabei nur veröffentlichte beachten. Id und Zeitpunkt der letzten Änderung
         fetch('api/modelinfos/published', { cache: 'reload'}).then(async function(modelsresponse) {
             var modelmetas = await modelsresponse.json();
             // Diese Methode ist nach dem async/await Schema, weil wir nach den ganzen asynchronen Aufrufen
@@ -30,7 +30,7 @@ window.addEventListener('load', function () {
                 // Detaillierte Modellinfos vom Server laden
                 var modeldetailresponse = await fetch('/api/modeldetails/' + modelmeta.modelid, { cache: 'reload' });
                 var model = await modeldetailresponse.json();
-                // Das hier kommt aus der models.json und steckt in den einzelnen Modelldateien nicht drin. Wird aber für Local Storage benötigt
+                // Das hier kommt aus der modelsinfos und steckt in den einzelnen Modelldateien nicht drin. Wird aber für Local Storage benötigt
                 model._id = modelmeta.modelid;
                 model.lastmodified = modelmeta.lastmodified;
                 // An dieser Stelle ist das Modell vom Server fertig geladen.
@@ -42,7 +42,6 @@ window.addEventListener('load', function () {
             localModels.sort(function(a, b) { return a.lastmodified < b.lastmodified ? 1 : -1; }).forEach(function(localModel) {
                 addModelToList(localModel);
             });
-            console.log(localModels);
             UTILS.hideElement('.progressbar');
         });
     });

@@ -133,12 +133,16 @@ body { position: relative; }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+/***** Listenseite *****/
+
 #listpage .grid > li { position: relative; }
 #listpage .grid > li > span.new {display: none;position: absolute;top: 0;right: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 0 4px;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 #listpage .grid > li > span.complete {display: none;position: absolute;top: 0;left: 0;color: #fff;background-color: #0c0;padding: 4px 12px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 #listpage .grid > li > img.complete~span.complete {display: block; }
 #listpage .grid > li > img.new { filter:grayscale(100%); }
 #listpage .grid > li > img.new~span.new {display: block; }
+
+/***** Spieleseite *****/
 
 #playpage .content { display: flex; position: relative; flex-direction: column; background-color: white; }
 #playpage .canvas { flex: 1; }
@@ -217,3 +221,25 @@ body { position: relative; }
     margin-right: 4px;
     box-shadow: 0 0 2px 1px white;
 }
+
+/***** Editierseite *****/
+
+#editpage .content { display: flex; position: relative; flex-direction: column; background-color: white; }
+#editpage .canvas { flex: 1; }
+
+#editpage .toolbar { display: flex; height:56px; }
+#editpage .toolbar .spacer { flex: 1; }
+#editpage .toolbar .icon { display: flex; font-size: 40px; cursor: pointer; background: none; border: none; width:48px; height: 48px; margin: 4px; }
+#editpage .toolbar .icon input { display: none; }
+#editpage .toolbar .icon span { flex: 1; }
+#editpage .toolbar .icon input:checked + span { outline: 3px solid #66f; background-color: #66f6; }
+#editpage .toolbar .icon.save { background-image:url(../icons/save.png);}
+#editpage .toolbar .icon.playmode span { background-image:url(../icons/playmode.png);}
+#editpage .toolbar .icon.paintmode span { background-image:url(../icons/paintmode.png);}
+#editpage .toolbar .icon.addmode span { background-image:url(../icons/addmode.png);}
+#editpage .toolbar .icon.removemode span { background-image:url(../icons/removemode.png);}
+#editpage .toolbar .icon.publish { background-image:url(../icons/publish.png);}
+#editpage .toolbar .icon.duplicate { background-image:url(../icons/duplicate.png);}
+#editpage .toolbar .icon.deleteModel { background-image:url(../icons/deleteModel.png);}
+
+#editpage .colorbar { display: flex; height:56px; user-select: none; overflow-x: auto; }
