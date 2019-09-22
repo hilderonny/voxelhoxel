@@ -8,7 +8,8 @@ var db = mysql.createConnection({
     host: process.env.DBHOST,
     user: process.env.DBUSER,
     password: process.env.DBPASSWORD,
-    database: process.env.DB
+    database: process.env.DB,
+    multipleStatements: true
 });
 db.connect(function (err) {
     if (err) throw err;
@@ -29,14 +30,29 @@ function merge() {
 
     var fs = require('fs');
 
+    var query = 'delete from models;';
+    var params = [];
+
     var models = JSON.parse(fs.readFileSync('./public/data/models.json'));
     models.forEach(function(model) {
-        model.data = JSON.parse(fs.readFileSync('./public/data/' + model._id + '.json'));
+        var data = JSON.parse(fs.readFileSync('./public/data/' + model._id + '.json'));
+        query += 'insert into models (data) values (?);';
+        params.push(JSON.stringify(data));
     });
-    console.log(models);
+    console.log(models, query, params);
 
-    db.query('select * from modelinfos;', function (err, res) {
-        console.log(res);
+    // Alle Modelle einfügen
+    db.query(query, params, function (err, res) {
+        var infoquery = 'delete from modelinfos;';
+        for (var i = 1; i < res.length; i++) {
+            var id = res[i].insertId;
+            var model = models[i - 1];
+            infoquery += 'insert into modelinfos (modelid, name, published, lastmodified) values(' + id + ', "' + model._id.substr(1) + '", 1, ' + model.lastmodified + ');';
+        }
+        infoquery += 'select * from modelinfos;';
+        db.query(infoquery, function (err, infores) {
+            console.log(err, infores);
+        });
     });
 
 }
