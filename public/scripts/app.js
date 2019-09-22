@@ -8,7 +8,7 @@ window.addEventListener('load', function () {
         // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
         UTILS.showElement('.progressbar');
         // Erst mal die Metadaten aus der models.json holen. Id und Zeitpunkt der letzten Änderung
-        fetch('data/models.json', { cache: 'reload'}).then(async function(modelsresponse) {
+        fetch('api/modelinfos', { cache: 'reload'}).then(async function(modelsresponse) {
             var modelmetas = await modelsresponse.json();
             // Diese Methode ist nach dem async/await Schema, weil wir nach den ganzen asynchronen Aufrufen
             // aller Modelle den Ladespinner wieder ausmachen müssen.
@@ -17,7 +17,7 @@ window.addEventListener('load', function () {
                 // Modelle, die noch nicht veröffentlicht sind, sollen auch nicht angezeigt werden
                 if (!modelmeta.published) continue;
                 // Prüfen, ob das Modell bereits lokal vorhanden ist
-                var localModelIndex = localModels.findIndex(function (m) { return m._id === modelmeta._id });
+                var localModelIndex = localModels.findIndex(function (m) { return m._id === modelmeta.modelid });
                 if (localModelIndex >= 0) {
                     var localModel = localModels[localModelIndex];
                     // Wenn das lokale Modell genauso alt ist oder bereits daran gemalt wurde, soll das lokale genommen werden
@@ -28,10 +28,10 @@ window.addEventListener('load', function () {
                 // Hier gibt es entweder kein lokales Modell, oder es wurde noch nicht bearbeitet und auf dem Server gibt es ein Update.
                 // In diesem Falle soll es erneut vom Server geladen werden.
                 // Detaillierte Modellinfos vom Server laden
-                var modeldetailresponse = await fetch('data/' + modelmeta._id + '.json', { cache: 'reload' });
+                var modeldetailresponse = await fetch('/api/modeldetails/' + modelmeta.modelid, { cache: 'reload' });
                 var model = await modeldetailresponse.json();
                 // Das hier kommt aus der models.json und steckt in den einzelnen Modelldateien nicht drin. Wird aber für Local Storage benötigt
-                model._id = modelmeta._id;
+                model._id = modelmeta.modelid;
                 model.lastmodified = modelmeta.lastmodified;
                 // An dieser Stelle ist das Modell vom Server fertig geladen.
                 // Es ist noch nicht in der lokalen Datenbank, also speichern wir es dort rein.

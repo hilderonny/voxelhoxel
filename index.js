@@ -3,7 +3,7 @@ var app = express();
 var http = require('http').createServer(app);
 var mysql = require('mysql');
 
-// Datenbank
+// Datenbank verbinden, bleibt ewig offen
 var db = mysql.createConnection({
     host: process.env.DBHOST,
     user: process.env.DBUSER,
@@ -20,6 +20,21 @@ db.connect(function (err) {
     });
 
     //merge();
+});
+
+// APIs
+// Modellinfos für Übersicht
+app.get('/api/modelinfos', function(req, res) {
+    db.query('select * from modelinfos', function (err, infos) {
+        res.send(infos);
+    });
+});
+
+// Details zu einem Modell holen
+app.get('/api/modeldetails/:id', function(req, res) {
+    db.query('select * from models where id = ?', req.params.id, function(err, details) {
+        res.send(details.length > 0 ? JSON.parse(details[0].data) : undefined);
+    });
 });
 
 // Statische HTML Dateien
