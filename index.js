@@ -24,8 +24,8 @@ db.connect(function (err) {
 
 // APIs
 // Modellinfos für Übersicht
-app.get('/api/modelinfos', function(req, res) {
-    db.query('select * from modelinfos', function (err, infos) {
+app.get('/api/modelinfos/published', function(req, res) {
+    db.query('select * from modelinfos where published = 1 order by lastmodified desc', function (err, infos) {
         res.send(infos);
     });
 });

@@ -8,7 +8,7 @@ window.addEventListener('load', function () {
         // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
         UTILS.showElement('.progressbar');
         // Erst mal die Metadaten aus der models.json holen. Id und Zeitpunkt der letzten Änderung
-        fetch('api/modelinfos', { cache: 'reload'}).then(async function(modelsresponse) {
+        fetch('api/modelinfos/published', { cache: 'reload'}).then(async function(modelsresponse) {
             var modelmetas = await modelsresponse.json();
             // Diese Methode ist nach dem async/await Schema, weil wir nach den ganzen asynchronen Aufrufen
             // aller Modelle den Ladespinner wieder ausmachen müssen.
@@ -39,9 +39,10 @@ window.addEventListener('load', function () {
                 localModels.push(model);
             }
             // Alle Modelle sortiert nach letztem Änderungsdatum anzeigen
-            localModels.sort(function(a, b) { return a.lastmodified > b.lastmodified ? 1 : -1; }).forEach(function(localModel) {
+            localModels.sort(function(a, b) { return a.lastmodified < b.lastmodified ? 1 : -1; }).forEach(function(localModel) {
                 addModelToList(localModel);
             });
+            console.log(localModels);
             UTILS.hideElement('.progressbar');
         });
     });
@@ -155,6 +156,8 @@ async function goBack() {
     if (currentModel.painted) {
         // Thumbnail erstellen
         currentModel.thumbnail = Player.makeScreenshot();
+        // Letzte Änderung
+        currentModel.lastmodified = Date.now();
         // Modell lokal speichern
         await LocalDb.saveModel(currentModel);
         // Thumbnail auf Liste aktualisieren

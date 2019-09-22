@@ -86,8 +86,6 @@ const LocalDb = (function() {
     saveModel: function(model) {
       return new Promise(async function(resolve, reject) {
         const db = await getDb();
-        delete model.listEl;
-        model.lastmodified = Date.now(); // Update last modified date
         const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).put(model);
         request.onerror = function() {
           reject(request);
