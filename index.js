@@ -19,12 +19,13 @@ db.connect(function (err) {
         console.log('listening on http://localhost:' + process.env.PORT);
     });
 
-    merge();
+    //merge();
 });
 
 // Statische HTML Dateien
 app.use(express.static('public'));
 
+/*
 // Daten aus JSON-Dateien in die Datenbank bringen
 function merge() {
 
@@ -56,3 +57,4 @@ function merge() {
     });
 
 }
+*/
