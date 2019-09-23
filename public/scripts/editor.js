@@ -154,6 +154,13 @@ var Editor = (function () {
                 objects.splice(objects.indexOf(previousIntersection), 1);
                 threeScene.remove(previousIntersection);
                 previousIntersection = undefined;
+            } else if (currentMode === 'paint' && previousIntersection) {
+                var x = previousIntersection.position.x;
+                var y = previousIntersection.position.y;
+                var z = previousIntersection.position.z;
+                currentModel.scene[z][y][x] = currentPaletteIndex;
+                previousIntersection.material = standardMaterials[currentPaletteIndex];
+                previousIntersection = undefined;
             }
         }
         // Maus bewegen
@@ -172,7 +179,7 @@ var Editor = (function () {
                 } else {
                     threeScene.remove(rollOverMesh);
                 }
-            } else if (currentMode === 'remove') {
+            } else if (currentMode === 'remove' || currentMode === 'paint') {
                 if (previousIntersection) {
                     previousIntersection.material = previousIntersection.originalMaterial;
                     previousIntersection = undefined; // Damit MouseUp nicht irgendwas blödes macht
@@ -181,7 +188,14 @@ var Editor = (function () {
                 if (intersects.length > 0) {
                     var obj = intersects[0].object;
                     obj.originalMaterial = obj.material;
-                    obj.material = removeMaterial;
+                    if (currentMode === 'remove') {
+                        obj.material = removeMaterial;
+                    } else {
+                        // Paint Modus
+                        obj.material = standardMaterials[currentPaletteIndex].clone();
+                        obj.material.transparent = true;
+                        obj.material.opacity = 0.9;
+                    }
                     previousIntersection = obj;
                 }
             }
