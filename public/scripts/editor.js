@@ -123,6 +123,25 @@ var Editor = (function () {
             currentMode = mode;
         },
 
+        // Ändert eine Palettenfarbe des aktuellen Modells
+        setPaletteColor: function(color) {
+            // Am Modell speichern
+            currentModel.colorpalette[currentPaletteIndex] = color;
+            // Zugehöriges Standardmaterial ändern
+            var material = standardMaterials[currentPaletteIndex];
+            if (color.length > 9) { // Hexadezimal mit Transparenz
+                var texture = new THREE.TextureLoader().load(color);
+                texture.magFilter = THREE.NearestFilter;
+                texture.minFilter = THREE.LinearMipMapLinearFilter;
+                material.color = new THREE.Color();
+                material.map = texture;
+            } else {
+                material.map = null;
+                material.color = new THREE.Color(color);
+            }
+            material.needsUpdate = true; // Neurendern erzwingen, siehe https://threejsfundamentals.org/threejs/lessons/threejs-materials.html
+        },
+
     }
 
     // Registriert Event Listener für Maus und Touch-Eingaben.

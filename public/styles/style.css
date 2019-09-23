@@ -133,6 +133,89 @@ body { position: relative; }
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+
+/**** Dialog allgemein *****/
+
+.dialog {
+    width: 280px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    border-radius: 4px;
+    box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),
+    0px 24px 38px 3px rgba(0, 0, 0, 0.14),
+    0px 9px 46px 8px rgba(0, 0, 0, 0.12),
+    0px 0px 0px 999px #232F3457;
+    background-color: white;
+    z-index: 100;
+}
+
+.dialog::before {
+    content: "";
+    position: fixed;
+    top: -5000px;
+    left: -5000px;
+    width: 9999px;
+    height: 9999px;
+    z-index: -1;
+}
+
+.dialog.invisible {
+    display: none;
+}
+
+.dialog > h1 {
+    font-size: 20px;
+    font-weight: normal;
+    padding: 20px 24px 0 24px;
+    color: #000000DE;
+}
+
+.dialog > p {
+    font-size: 16px;
+    padding: 20px 24px 0 24px;
+    color: #00000099;
+}
+
+.dialog > p > input {
+    font-size: 16px;
+    padding: 16px 12px;
+    width: 100%;
+    border: 2px solid;
+    border-radius: 4px;
+    outline: none;
+    border-color:  #0000001E;
+}
+
+.dialog > p > input:focus {
+    border-color:  #a37f81;
+}
+
+.dialog > .buttonbar {
+    margin-top:28px;
+    padding: 8px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.dialog > .buttonbar > button {
+    min-width: 64px;
+    text-align: center;
+    height: 36px;
+    background: none;
+    padding: 0 8px;
+    border: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #a37f81;
+}
+
+.dialog > .buttonbar > button:hover {
+    background-color:  #a37f8144;
+}
+
+
 /***** Listenseite *****/
 
 #listpage .grid > li { position: relative; }
@@ -241,6 +324,7 @@ body { position: relative; }
 #editpage .toolbar .icon.publish { background-image:url(../icons/publish.png);}
 #editpage .toolbar .icon.duplicate { background-image:url(../icons/duplicate.png);}
 #editpage .toolbar .icon.deleteModel { background-image:url(../icons/deleteModel.png);}
+#editpage .toolbar .icon.changecolor { background-image:url(../icons/changecolor.png);}
 
 #editpage .colorbar { display: flex; height:56px; user-select: none; overflow-x: auto; }
 #editpage .colorbar label {

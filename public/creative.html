@@ -56,12 +56,23 @@
                     <input type="radio" name="mode" onchange="Editor.setMode('remove');" /><span></span>
                 </label>
                 <div class="spacer"></div>
+                <button class="icon changecolor" onclick="showChangeColorDialog();"></button>
                 <button class="icon save" onclick="save();"></button>
                 <button class="icon publish" onclick="publish();"></button>
                 <button class="icon duplicate" onclick="duplicate();"></button>
                 <button class="icon deleteModel" onclick="deleteModel();"></button>
             </div>
             <div class="colorbar"></div>
+        </div>
+    </div>
+
+
+    <div class="dialog invisible" id="changecolordialog">
+        <h1>Farbe ändern</h1>
+        <p><input /></p>
+        <div class="buttonbar">
+            <button onclick="changeColor();">OK</button>
+            <button onclick="UTILS.hideElement('#changecolordialog');">Abbrechen</button>
         </div>
     </div>
 

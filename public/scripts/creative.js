@@ -75,10 +75,10 @@ async function goBack() {
 function setupColorBar(model) {
     var colorbar = document.querySelector('#editpage .content .colorbar');
     colorbar.innerHTML = '';
-    model.colorpalette.forEach(function(colorOrUrl, index) {
+    currentModel.colorpalette.forEach(function (colorOrUrl, index) {
         var label = document.createElement('label');
         label.innerHTML = '<input type="radio" name="colorbarinput" value="' + index + '"/><span>' + (index + 1) + '</span>';
-        label.querySelector('input').addEventListener('change', function(evt) {
+        label.querySelector('input').addEventListener('change', function (evt) {
             var paletteIndex = parseInt(evt.target.value);
             Editor.selectColor(paletteIndex);
         });
@@ -89,4 +89,27 @@ function setupColorBar(model) {
         }
         colorbar.appendChild(label);
     });
+}
+
+// Zeigt den Farbänder-Dialog an
+function showChangeColorDialog() {
+    var input = document.querySelector('#changecolordialog input');
+    var color = currentModel.colorpalette[document.querySelector('#editpage .content .colorbar input:checked').value];
+    input.value = color;
+    UTILS.showElement('#changecolordialog');
+    input.focus();
+    input.select();
+}
+
+// Ändert die aktuell gewählte Farbe durch den Dialog und schließt den Dialog
+function changeColor() {
+    var color = document.querySelector('#changecolordialog input').value;
+    Editor.setPaletteColor(color);
+    var label = document.querySelector('#editpage .content .colorbar input:checked').parentNode;
+    if (color.length < 10) {
+        label.style.backgroundColor = color;
+    } else {
+        label.style.backgroundImage = 'url(' + color + ')';
+    }
+    UTILS.hideElement('#changecolordialog');
 }
