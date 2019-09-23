@@ -13,6 +13,7 @@ var Editor = (function () {
     var previousIntersection; // Zeiger auf zuletzt angezieltes Objekt. Für Entfernen-Modus relevant
     var removeMaterial; // Material, das benutzt wird, um eine Box zum Entfernen zu markieren
     var currentModel; // Referenz auf aktuelles Modell
+    var currentPaletteIndex; // Aktuell ausgewählter Paletteneintrag
 
     // Objekt zurück geben, welche irgendwelche Instanzmethoden bereit stellt.
     return {
@@ -111,6 +112,12 @@ var Editor = (function () {
             return data;
         },
 
+        // Legt eine Farbe als diejenige fest, die ab sofort verwendet wird.
+        // Wirkt sich auf Add- und Paint Modus aus
+        selectColor: function(paletteIndex) {
+            currentPaletteIndex = paletteIndex;
+        },
+
         // Legt den aktuellen Modus fest
         setMode: function (mode) {
             currentMode = mode;
@@ -128,14 +135,13 @@ var Editor = (function () {
         // Maus hoch oder Touch loslassen
         var handleUp = function () {
             if (currentMode === 'add' && rollOverMesh.parent) {
-                var paletteIndex = 0; // TODO: Richtigen Index nehmen
                 var x = rollOverMesh.position.x;
                 var y = rollOverMesh.position.y;
                 var z = rollOverMesh.position.z;
                 if (!currentModel.scene[z]) currentModel.scene[z] = {};
                 if (!currentModel.scene[z][y]) currentModel.scene[z][y] = {};
-                currentModel.scene[z][y][x] = paletteIndex;
-                createEditBox(paletteIndex, x, y, z);
+                currentModel.scene[z][y][x] = currentPaletteIndex;
+                createEditBox(currentPaletteIndex, x, y, z);
                 threeScene.remove(rollOverMesh);
             } else if (currentMode === 'remove' && previousIntersection) {
                 var x = previousIntersection.position.x;
@@ -229,7 +235,6 @@ var Editor = (function () {
     // Erstellt eine Liste von ThreeJS Objekten aus der gegebenen Szene
     function createBoxesForModel(model) {
         var scene = model.scene;
-        var painted = model.painted;
         Object.keys(scene).forEach(function (zKey) {
             const bz = scene[zKey];
             Object.keys(bz).forEach(function (yKey) {
@@ -248,9 +253,7 @@ var Editor = (function () {
     // Erzeugt einen Würfel an einer bestimmten Position für Editiermodus.
     // Auf Performance wird hier nicht geachtet, es werden einfache Würfel verwendet
     function createEditBox(paletteIndex, x, y, z) {
-        // Das Material muss geklont werden, damit im Remove-Modus auch nur die eine Box leuchtet
-        var material = standardMaterials[paletteIndex].clone();
-        var boxMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
+        var boxMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), standardMaterials[paletteIndex]);
         // Würfel positionieren
         boxMesh.position.x = x;
         boxMesh.position.y = y;

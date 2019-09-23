@@ -55,8 +55,11 @@ function addModelToList(model) {
 // Wird asynchron ausgeführt, weil das Laden eine Weile dauern kann
 function showEditModel(model) {
     currentModel = model;
+    setupColorBar(model);
     Editor.loadModel(model);
     UTILS.showElement('#editpage');
+    // Erste Farbe vorauswählen
+    document.querySelector('#editpage .colorbar input').click();
     // Hinzufügen Modus vorauswählen
     document.querySelector('#editpage .toolbar .addmode').click();
 }
@@ -65,4 +68,25 @@ function showEditModel(model) {
 async function goBack() {
     currentModel = undefined;
     UTILS.hideElement('#editpage');
+}
+
+// Füllt die Farbpalette mit den gegebenen Farben und Texturen
+// Wenn die Farbe länger als 9 Zeichen ist, wird sie als Textur-URL interpretiert
+function setupColorBar(model) {
+    var colorbar = document.querySelector('#editpage .content .colorbar');
+    colorbar.innerHTML = '';
+    model.colorpalette.forEach(function(colorOrUrl, index) {
+        var label = document.createElement('label');
+        label.innerHTML = '<input type="radio" name="colorbarinput" value="' + index + '"/><span>' + (index + 1) + '</span>';
+        label.querySelector('input').addEventListener('change', function(evt) {
+            var paletteIndex = parseInt(evt.target.value);
+            Editor.selectColor(paletteIndex);
+        });
+        if (colorOrUrl.length < 10) {
+            label.style.backgroundColor = colorOrUrl;
+        } else {
+            label.style.backgroundImage = 'url(' + colorOrUrl + ')';
+        }
+        colorbar.appendChild(label);
+    });
 }
