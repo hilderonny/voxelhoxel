@@ -1,14 +1,14 @@
+var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
+var allModels = []; // Liste aller Modelle
+
 // Kreativmodus
 // Dieser funktioniert derzeit nur mit Netzverbindung ohne lokalen Speicher
 window.addEventListener('load', function () {
-
-    var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
 
     // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
     UTILS.showElement('.progressbar');
     // Erst mal die Metadaten aus der models.json holen. Id und Zeitpunkt der letzten Änderung
     fetch('api/modelinfos', { cache: 'reload' }).then(async function (modelsresponse) {
-        var allModels = [];
         var modelmetas = await modelsresponse.json();
         // Diese Methode ist nach dem async/await Schema, weil wir nach den ganzen asynchronen Aufrufen
         // aller Modelle den Ladespinner wieder ausmachen müssen.
@@ -41,10 +41,11 @@ function addModelToList(model) {
     var list = document.querySelector('#listpage .grid');
     var el = document.createElement('li');
     el.setAttribute('id', 'model_' + model._id);
+    el.model = model;
     el.innerHTML = '<img src="' + model.thumbnail + '"/>';
     el.addEventListener('click', function () {
         el.classList.add('progressspinner');
-        showEditModel(model);
+        showEditModel(el.model); // Aus Element auslesen, weil es durch Speichern zwischendurch aktualisiert sein kann
         el.classList.remove('progressspinner');
     });
     list.appendChild(el);
@@ -118,9 +119,10 @@ function changeColor() {
 // Speichert das Modell auf dem Server.
 // Dazu wird das Thumbnail aktualisiert, das Änderungsdatum geändert und die Listenansicht aktualisiert
 async function save() {
+    var index = allModels.indexOf(currentModel);
     currentModel = Editor.getCurrentModel();
     currentModel.thumbnail = Editor.makeScreenshot();
-    var response = await fetch('/api/savemodel/' + currentModel._id, {
+    await fetch('/api/savemodel/' + currentModel._id, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -128,5 +130,15 @@ async function save() {
         },
         body: JSON.stringify(currentModel)    
     });
+    // Modelliste aktualisieren
+    allModels[index] = currentModel;
+    document.querySelector('#listpage .grid li[id=model_' + currentModel._id + ']').model = currentModel;
+    document.querySelector('#listpage .grid li[id=model_' + currentModel._id + '] img').src = currentModel.thumbnail;
     alert('Modell gespeichert.');
+}
+
+// Setzt den Status des Modells auf veröffentlicht.
+async function publish() {
+    Editor.getCurrentModel().published = 1;
+    await save();
 }

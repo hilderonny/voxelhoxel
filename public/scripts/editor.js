@@ -87,9 +87,6 @@ var Editor = (function () {
             // Kameraposition und -ausrichtung für Modell festlegen
             camera.position.set(model.pos.x, model.pos.y, model.pos.z);
             controls.target.set(model.target.x, model.target.y, model.target.z);
-            // Kameraposition und Ziel an Modell binden, damit es auch gespeichert wird
-            model.pos = camera.position;
-            model.target = controls.target;
         },
 
         // Macht ein Foto der aktuellen Ansicht
@@ -144,6 +141,9 @@ var Editor = (function () {
 
         // Liefert das aktuelle Modell in seinem derzeitigen Zustand. Wird zum Speichern verwendet
         getCurrentModel: function() {
+            // Kameraposition und Ziel an Modell binden, damit es auch gespeichert wird
+            currentModel.pos = camera.position;
+            currentModel.target = controls.target;
             return currentModel;
         }
 

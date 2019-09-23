@@ -1,7 +1,7 @@
 {
   "name": "www.voxelhoxel.de",
   "version": "1.0.0",
-  "description": "",
+  "description": "Malen nach Zahlen in 3D",
   "main": "index.js",
   "repository": {
     "type": "git",
