@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var mysql = require('mysql');
+var bodyParser = require('body-parser');
 
 // Datenbank verbinden, bleibt ewig offen
 var db = mysql.createConnection({
@@ -42,6 +43,23 @@ app.get('/api/modelinfos', function(req, res) {
 app.get('/api/modeldetails/:id', function(req, res) {
     db.query('select * from models where id = ?', req.params.id, function(err, details) {
         res.send(details.length > 0 ? JSON.parse(details[0].data) : undefined);
+    });
+});
+
+// JSON als POST-Body akzeptieren
+app.use(bodyParser.json());
+
+// Bestehendes Modell speichern
+app.post('/api/savemodel/:id', function(req, res) {
+    var model = req.body;
+    // Manchmal ist die _id noch dran
+    delete model._id;
+    var id = req.params.id;
+    // Änderungszeitpunkt merken
+    model.lastmodified = Date.now();
+    db.query('update models set data = ? where id = ?;update modelinfos set lastmodified = ? where modelid = ?;', [JSON.stringify(model), id, model.lastmodified, id], function(err, result) {
+        if (err) return res.status(400).send(err);
+        res.sendStatus(200);
     });
 });
 

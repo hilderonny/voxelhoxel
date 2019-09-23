@@ -34,7 +34,6 @@ window.addEventListener('load', function () {
 
     // Editor initialisieren. Der wird in allen Modellansichten wiederverwendet
     Editor.init(document.querySelector('#editpage .canvas'));
-
 });
 
 // Fügt das Bild eines Modells in die Liste ein und verlinkt es mit der Detailansicht.
@@ -62,6 +61,8 @@ function showEditModel(model) {
     document.querySelector('#editpage .colorbar input').click();
     // Hinzufügen Modus vorauswählen
     document.querySelector('#editpage .toolbar .addmode').click();
+    // Resize Event triggern, damit die Colorbar richtig skaliert wird
+    window.dispatchEvent(new Event('resize'));
 }
 
 // Wenn auf den Backbutton gedrückt wurde, prüfen, ob es Änderungen gibt und ob diese verworfen werden sollen
@@ -72,7 +73,7 @@ async function goBack() {
 
 // Füllt die Farbpalette mit den gegebenen Farben und Texturen
 // Wenn die Farbe länger als 9 Zeichen ist, wird sie als Textur-URL interpretiert
-function setupColorBar(model) {
+function setupColorBar() {
     var colorbar = document.querySelector('#editpage .content .colorbar');
     colorbar.innerHTML = '';
     currentModel.colorpalette.forEach(function (colorOrUrl, index) {
@@ -112,4 +113,20 @@ function changeColor() {
         label.style.backgroundImage = 'url(' + color + ')';
     }
     UTILS.hideElement('#changecolordialog');
+}
+
+// Speichert das Modell auf dem Server.
+// Dazu wird das Thumbnail aktualisiert, das Änderungsdatum geändert und die Listenansicht aktualisiert
+async function save() {
+    currentModel = Editor.getCurrentModel();
+    currentModel.thumbnail = Editor.makeScreenshot();
+    var response = await fetch('/api/savemodel/' + currentModel._id, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(currentModel)    
+    });
+    alert('Modell gespeichert.');
 }

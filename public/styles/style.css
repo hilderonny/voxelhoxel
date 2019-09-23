@@ -110,16 +110,15 @@ body { position: relative; }
 }
 
 .grid > li {
-    margin: 16px;
+    margin: 8px;
     display: inline-block;
     list-style-type: none;
-    width: 272px;
-    height: 272px;
     border-radius: 4px;
     box-shadow:  0px 1px 3px 0px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14),
     0px 2px 1px -1px rgba(0, 0, 0, 0.12);
     background-color: white;
+    padding: 3px;
 }
 
 @keyframes progressbar {
@@ -221,6 +220,7 @@ body { position: relative; }
 #listpage .grid > li { position: relative; }
 #listpage .grid > li > span.new {display: none;position: absolute;top: 0;right: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 0 4px;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 #listpage .grid > li > span.complete {display: none;position: absolute;top: 0;left: 0;color: #fff;background-color: #0c0;padding: 4px 12px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+#listpage .grid > li > img { width: 130px; }
 #listpage .grid > li > img.complete~span.complete {display: block; }
 #listpage .grid > li > img.new { filter:grayscale(100%); }
 #listpage .grid > li > img.new~span.new {display: block; }
@@ -235,7 +235,7 @@ body { position: relative; }
 #playpage .toolbar .icon { font-size: 40px; cursor: pointer; background: none; border: none; width:48px; height: 48px; margin: 4px; }
 #playpage .toolbar .icon.clear { background-image:url(../icons/clear.png);}
 
-#playpage .colorbar { display: flex; height:56px; user-select: none; overflow-x: auto; }
+#playpage .colorbar { display: flex; min-height:56px; user-select: none; overflow-x: auto; }
 #playpage .colorbar label {
     display: block;
     width: 48px;
@@ -326,7 +326,7 @@ body { position: relative; }
 #editpage .toolbar .icon.deleteModel { background-image:url(../icons/deleteModel.png);}
 #editpage .toolbar .icon.changecolor { background-image:url(../icons/changecolor.png);}
 
-#editpage .colorbar { display: flex; height:56px; user-select: none; overflow-x: auto; }
+#editpage .colorbar { display: flex; min-height:56px; user-select: none; overflow-x: auto; }
 #editpage .colorbar label {
     display: block;
     width: 48px;

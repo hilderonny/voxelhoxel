@@ -75,6 +75,8 @@ function showPlayModel(model) {
     // Erste Farbe selektieren
     document.querySelector('#playpage .content .colorbar input').click();
     UTILS.showElement('#playpage');
+    // Resize Event triggern, damit die Colorbar richtig skaliert wird
+    window.dispatchEvent(new Event('resize'));
 }
 
 // Füllt die Farbpalette mit den gegebenen Farben und Texturen

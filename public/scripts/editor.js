@@ -142,6 +142,11 @@ var Editor = (function () {
             material.needsUpdate = true; // Neurendern erzwingen, siehe https://threejsfundamentals.org/threejs/lessons/threejs-materials.html
         },
 
+        // Liefert das aktuelle Modell in seinem derzeitigen Zustand. Wird zum Speichern verwendet
+        getCurrentModel: function() {
+            return currentModel;
+        }
+
     }
 
     // Registriert Event Listener für Maus und Touch-Eingaben.
