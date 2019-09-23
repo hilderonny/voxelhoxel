@@ -63,6 +63,30 @@ app.post('/api/savemodel/:id', function(req, res) {
     });
 });
 
+// Neues Modell erstellen
+app.post('/api/createmodel', function(req, res) {
+    var model = req.body;
+    // Änderungszeitpunkt merken
+    model.lastmodified = Date.now();
+    db.query('insert into models (data) values (?)', JSON.stringify(model), function(modelserr, modelsresult) {
+        if (modelserr) return res.status(400).send(modelserr);
+        var id = modelsresult.insertId;
+        db.query('insert into modelinfos (modelid, lastmodified) values (?, ?)', [id, model.lastmodified], function(modelinfoserr, modelinfosresult) {
+            if (modelinfoserr) return res.status(400).send(modelinfoserr);
+            res.send(id);
+        });
+    });
+});
+
+// Bestehendes Modell löschen
+app.delete('/api/savemodel/:id', function(req, res) {
+    var id = req.params.id;
+    db.query('delete from models where id = ?;delete from modelinfos where modelid = ?;', [id, id], function(err, result) {
+        if (err) return res.status(400).send(err);
+        res.sendStatus(200);
+    });
+});
+
 // Statische HTML Dateien
 app.use(express.static('public'));
 
