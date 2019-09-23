@@ -57,7 +57,7 @@ app.post('/api/savemodel/:id', function(req, res) {
     var id = req.params.id;
     // Änderungszeitpunkt merken
     model.lastmodified = Date.now();
-    db.query('update models set data = ? where id = ?;update modelinfos set lastmodified = ? where modelid = ?;', [JSON.stringify(model), id, model.lastmodified, id], function(err, result) {
+    db.query('update models set data = ? where id = ?;update modelinfos set published = ?, lastmodified = ? where modelid = ?;', [JSON.stringify(model), id, model.published, model.lastmodified, id], function(err, result) {
         if (err) return res.status(400).send(err);
         res.sendStatus(200);
     });
@@ -71,15 +71,15 @@ app.post('/api/createmodel', function(req, res) {
     db.query('insert into models (data) values (?)', JSON.stringify(model), function(modelserr, modelsresult) {
         if (modelserr) return res.status(400).send(modelserr);
         var id = modelsresult.insertId;
-        db.query('insert into modelinfos (modelid, lastmodified) values (?, ?)', [id, model.lastmodified], function(modelinfoserr, modelinfosresult) {
+        db.query('insert into modelinfos (published, modelid, lastmodified) values (0, ?, ?)', [id, model.lastmodified], function(modelinfoserr, modelinfosresult) {
             if (modelinfoserr) return res.status(400).send(modelinfoserr);
-            res.send(id);
+            res.status(200).send({ id: id });
         });
     });
 });
 
 // Bestehendes Modell löschen
-app.delete('/api/savemodel/:id', function(req, res) {
+app.delete('/api/deletemodel/:id', function(req, res) {
     var id = req.params.id;
     db.query('delete from models where id = ?;delete from modelinfos where modelid = ?;', [id, id], function(err, result) {
         if (err) return res.status(400).send(err);

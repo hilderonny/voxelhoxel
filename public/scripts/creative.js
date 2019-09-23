@@ -14,8 +14,6 @@ window.addEventListener('load', function () {
         // aller Modelle den Ladespinner wieder ausmachen müssen.
         for (var i = 0; i < modelmetas.length; i++) {
             var modelmeta = modelmetas[i];
-            // Modelle, die noch nicht veröffentlicht sind, sollen auch nicht angezeigt werden
-            if (!modelmeta.published) continue;
             // Detaillierte Modellinfos vom Server laden
             var modeldetailresponse = await fetch('/api/modeldetails/' + modelmeta.modelid, { cache: 'reload' });
             var model = await modeldetailresponse.json();
@@ -62,6 +60,10 @@ function showEditModel(model) {
     document.querySelector('#editpage .colorbar input').click();
     // Hinzufügen Modus vorauswählen
     document.querySelector('#editpage .toolbar .addmode').click();
+    // Publishing ausblenden, wenn Modell schon veröffentlicht ist
+    document.querySelector('#editpage .toolbar .publish').style.display = currentModel.published ? 'none' : 'flex';
+    // Löschen-Button anzeigen, kann sein, dass der ausgeblendet war
+    document.querySelector('#editpage .toolbar .deleteModel').style.display = 'flex';
     // Resize Event triggern, damit die Colorbar richtig skaliert wird
     window.dispatchEvent(new Event('resize'));
 }
@@ -119,26 +121,88 @@ function changeColor() {
 // Speichert das Modell auf dem Server.
 // Dazu wird das Thumbnail aktualisiert, das Änderungsdatum geändert und die Listenansicht aktualisiert
 async function save() {
-    var index = allModels.indexOf(currentModel);
-    currentModel = Editor.getCurrentModel();
-    currentModel.thumbnail = Editor.makeScreenshot();
-    await fetch('/api/savemodel/' + currentModel._id, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(currentModel)    
-    });
-    // Modelliste aktualisieren
-    allModels[index] = currentModel;
-    document.querySelector('#listpage .grid li[id=model_' + currentModel._id + ']').model = currentModel;
-    document.querySelector('#listpage .grid li[id=model_' + currentModel._id + '] img').src = currentModel.thumbnail;
-    alert('Modell gespeichert.');
+    var editModel = Editor.getCurrentModel();
+    if (editModel._id) { // Modell existiert bereits
+        var index = allModels.indexOf(currentModel);
+        currentModel = editModel;
+        currentModel.thumbnail = Editor.makeScreenshot();
+        await fetch('/api/savemodel/' + currentModel._id, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentModel)
+        });
+        // Modelliste aktualisieren
+        allModels[index] = currentModel;
+        document.querySelector('#listpage .grid li[id=model_' + currentModel._id + ']').model = currentModel;
+        document.querySelector('#listpage .grid li[id=model_' + currentModel._id + '] img').src = currentModel.thumbnail;
+        alert('Modell gespeichert.');
+    } else {
+        // Neues Modell
+        currentModel = editModel;
+        currentModel.thumbnail = Editor.makeScreenshot();
+        var response = await fetch('/api/createmodel', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentModel)
+        });
+        var content = await response.json();
+        currentModel._id = content.id;
+        // Modelliste aktualisieren
+        allModels.push(currentModel);
+        addModelToList(currentModel);
+        document.querySelector('#editpage .toolbar .deleteModel').style.display = 'flex';
+        alert('Modell gespeichert.');
+    }
 }
 
 // Setzt den Status des Modells auf veröffentlicht.
 async function publish() {
     Editor.getCurrentModel().published = 1;
     await save();
+    document.querySelector('#editpage .toolbar .publish').style.display = 'none';
+}
+
+// Erstellt ein neues Modell und öffnet dieses
+function add() {
+    showEditModel({
+        scene: { 0: { 0: { 0: 0 } } },
+        pos: { x: 5, y: 5, z: 5 },
+        colorpalette: ["#000000", "#000080", "#008000", "#008080", "#800000", "#800080", "#808000", "#C0C0C0", "#808080", "#0000FF", "#00FF00", "#00FFFF", "#FF0000", "#FF00FF", "#FFFF00", "#FFFFFF"],
+        target: { x: 0, y: 0, z: 0 }
+    });
+    document.querySelector('#editpage .toolbar .deleteModel').style.display = 'none';
+}
+
+// Dupliziert das aktuelle Modell, indem der Inhalt geklont und die ID gelöscht wird
+function duplicate() {
+    var dup = JSON.parse(JSON.stringify(currentModel));
+    delete dup._id;
+    delete dup.published;
+    showEditModel(dup);
+    document.querySelector('#editpage .toolbar .publish').style.display = 'flex';
+    document.querySelector('#editpage .toolbar .deleteModel').style.display = 'none';
+    alert('Modell dupliziert.');
+}
+
+// Löscht das aktuelle Modell und zeigt die Liste wieder an
+async function deleteModel() {
+    if (!confirm('Wirklich löschen?')) return;
+    await fetch('/api/deletemodel/' + currentModel._id, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+    allModels.splice(allModels.indexOf(currentModel._id), 1);
+    var li = document.querySelector('#listpage .grid li[id=model_' + currentModel._id + ']');
+    li.parentNode.removeChild(li);
+    alert('Modell gelöscht.');
+    goBack();
 }
