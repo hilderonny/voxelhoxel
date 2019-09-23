@@ -3,6 +3,7 @@ var Editor = (function () {
 
     var threeScene; // Referenz auf ThreeJS Szene
     var renderer; // Referenz auf den ThreeJS renderer
+    var tempRenderer; // Renderer für Thumbnails
     var camera; // Aktuell angezeigte ThreeJS Kamera
     var objects; // Liste aller ThreeJS Objekte, die aktuell in der Szene enthalten sind
     var controls; // Orbit Controls zum Festlegen der Initialien Ausrichtung
@@ -29,6 +30,12 @@ var Editor = (function () {
                 preserveDrawingBuffer: true // Für Thumbnailerstellung wichtig
             });
             renderer.setPixelRatio(window.devicePixelRatio);
+            // Thumbnail Renderer
+            var thumbnailcanvas = document.createElement('canvas');
+            thumbnailcanvas.width = 256;
+            thumbnailcanvas.height = 256;
+            tempRenderer = new THREE.WebGLRenderer({ canvas: thumbnailcanvas, antialias: true, preserveDrawingBuffer: true });
+            tempRenderer.setSize(256, 256);
             camera = new THREE.PerspectiveCamera(60, 1, 1, 1000);
             camera.position.set(400, 200, 0);
             // Orbit Controls vorbereiten, benötigen Animation loop
@@ -91,11 +98,6 @@ var Editor = (function () {
 
         // Macht ein Foto der aktuellen Ansicht
         makeScreenshot: function () {
-            var canvas = document.createElement('canvas');
-            canvas.width = 256;
-            canvas.height = 256;
-            var tempRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true });
-            tempRenderer.setSize(256, 256);
             var oldAspect = camera.aspect;
             camera.aspect = 1;
             camera.updateProjectionMatrix();
