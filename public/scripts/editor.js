@@ -240,7 +240,7 @@ var Editor = (function () {
             if (intersects.length < 1) return;
             var intersection = intersects[0];
             if (currentMode === 'add') {
-                var position = intersection.object.position.add(intersection.face.normal);
+                var position = intersection.object.position.clone().add(intersection.face.normal);
                 var x = position.x;
                 var y = position.y;
                 var z = position.z;
@@ -248,11 +248,13 @@ var Editor = (function () {
                 if (!currentModel.scene[z][y]) currentModel.scene[z][y] = {};
                 currentModel.scene[z][y][x] = currentPaletteIndex;
                 createEditBox(currentPaletteIndex, x, y, z);
+                console.log(currentModel.scene);
             } else if (currentMode === 'remove') {
                 var position = intersection.object.position;
                 var x = position.x;
                 var y = position.y;
                 var z = position.z;
+                console.log(currentModel.scene);
                 delete currentModel.scene[z][y][x];
                 // Modell aufräumen
                 if (Object.keys(currentModel.scene[z][y]).length < 1) delete currentModel.scene[z][y];
