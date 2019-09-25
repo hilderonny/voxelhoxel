@@ -358,6 +358,7 @@ body { position: relative; }
     font-size: 32px;
     border-radius: 24px;
     text-shadow: 0px 0px 3px white;
+    background-size: contain;
 }
 #editpage .colorbar label input { display: none; position: relative; }
 #editpage .colorbar label input:checked + span {

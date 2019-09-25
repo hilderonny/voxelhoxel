@@ -155,8 +155,10 @@ var Editor = (function () {
     function registerInputListener() {
         var raycaster = new THREE.Raycaster();
         var mousePosition = new THREE.Vector2();
+        var isDown = false; // Wenn Maus gedrückt wurde, sollen Move-Bewegungen nicht zum Hinzufügen oder Löschen führen
         // Maus runter oder Touch Beginn
         var handleDown = function () {
+            isDown = true;
         };
         // Maus hoch oder Touch loslassen
         var handleUp = function () {
@@ -188,6 +190,7 @@ var Editor = (function () {
                 previousIntersection.material = standardMaterials[currentPaletteIndex];
                 previousIntersection = undefined;
             }
+            isDown = false;
         }
         // Maus bewegen
         renderer.domElement.addEventListener('mousemove', function () {
@@ -196,7 +199,7 @@ var Editor = (function () {
             mousePosition.set((event.offsetX / parentNode.clientWidth) * 2 - 1, - (event.offsetY / parentNode.clientHeight) * 2 + 1);
             raycaster.setFromCamera(mousePosition, camera);
             // Im Hinzufügen-Modus den Rollover an die Mausposition setzen
-            if (currentMode === 'add') {
+            if (currentMode === 'add' && !isDown) {
                 var intersects = raycaster.intersectObjects(objects);
                 if (intersects.length > 0) {
                     var intersect = intersects[0];
@@ -205,7 +208,7 @@ var Editor = (function () {
                 } else {
                     threeScene.remove(rollOverMesh);
                 }
-            } else if (currentMode === 'remove' || currentMode === 'paint') {
+            } else if ((currentMode === 'remove' || currentMode === 'paint') && !isDown) {
                 if (previousIntersection) {
                     previousIntersection.material = previousIntersection.originalMaterial;
                     previousIntersection = undefined; // Damit MouseUp nicht irgendwas blödes macht
@@ -227,7 +230,45 @@ var Editor = (function () {
             }
         }, false);
         renderer.domElement.addEventListener('mouseup', function () { handleUp(); }, false);
-        renderer.domElement.addEventListener('touchend', function () { handleUp(); }, false);
+        renderer.domElement.addEventListener('touchend', function () {
+            if (!isDown) return; // Nur handhaben, wenn vorher auf einen Würfel getippt wurde
+            var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
+            var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
+            mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
+            raycaster.setFromCamera(mousePosition, camera);
+            var intersects = raycaster.intersectObjects(objects);
+            if (intersects.length < 1) return;
+            var intersection = intersects[0];
+            if (currentMode === 'add') {
+                var position = intersection.object.position.add(intersection.face.normal);
+                var x = position.x;
+                var y = position.y;
+                var z = position.z;
+                if (!currentModel.scene[z]) currentModel.scene[z] = {};
+                if (!currentModel.scene[z][y]) currentModel.scene[z][y] = {};
+                currentModel.scene[z][y][x] = currentPaletteIndex;
+                createEditBox(currentPaletteIndex, x, y, z);
+            } else if (currentMode === 'remove') {
+                var position = intersection.object.position;
+                var x = position.x;
+                var y = position.y;
+                var z = position.z;
+                delete currentModel.scene[z][y][x];
+                // Modell aufräumen
+                if (Object.keys(currentModel.scene[z][y]).length < 1) delete currentModel.scene[z][y];
+                if (Object.keys(currentModel.scene[z]).length < 1) delete currentModel.scene[z];
+                objects.splice(objects.indexOf(intersection.object), 1);
+                threeScene.remove(intersection.object);
+            } else if (currentMode === 'paint') {
+                var position = intersection.object.position;
+                var x = position.x;
+                var y = position.y;
+                var z = position.z;
+                currentModel.scene[z][y][x] = currentPaletteIndex;
+                intersection.object.material = standardMaterials[currentPaletteIndex];
+            }
+            isDown = false;
+        }, false);
         renderer.domElement.addEventListener('mousedown', function () {
             event.preventDefault();
             mousePosition.set(
@@ -240,12 +281,16 @@ var Editor = (function () {
             var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
             var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
             mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
+            // Nur down merken, wenn man einen Würfel angetippt hat
+            raycaster.setFromCamera(mousePosition, camera);
+            var intersects = raycaster.intersectObjects(objects);
+            if (intersects.length < 1) return;
             handleDown();
         }, false);
         renderer.domElement.addEventListener('touchmove', function () {
-            var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
-            var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
-            mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
+//            var x = event.changedTouches[0].clientX - event.target.offsetParent.offsetLeft;
+//            var y = event.changedTouches[0].clientY - event.target.offsetParent.offsetTop;
+//            mousePosition.set((x / renderer.domElement.parentNode.clientWidth) * 2 - 1, -(y / renderer.domElement.parentNode.clientHeight) * 2 + 1);
         }, { passive: false }); // https://stackoverflow.com/a/49582193/5964970
     }
 
