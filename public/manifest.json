@@ -1,8 +1,8 @@
 {
   "short_name" : "Voxelhoxel",
   "name": "Voxelhoxel",
-  "theme_color": "#a37f81",
-  "background_color": "#a37f81",
+  "theme_color": "#88bbff",
+  "background_color": "#88bbff",
   "display": "standalone",
   "scope": "/",
   "start_url": "/index.html",
