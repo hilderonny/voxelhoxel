@@ -19,7 +19,7 @@ var Player = (function () {
         init: function (targetElement) {
             // Initialize ThreeJS
             threeScene = new THREE.Scene();
-            threeScene.background = new THREE.Color(0xd5aeb0);
+            threeScene.background = new THREE.Color(0xE6F1FF);
             renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 preserveDrawingBuffer: true // Für Thumbnailerstellung wichtig
