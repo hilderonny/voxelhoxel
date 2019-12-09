@@ -189,9 +189,7 @@ async function goBack() {
     UTILS.hideElement('#playpage');
 }
 
-// Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
-function resetModel() {
-    if (!confirm('Soll das Modell wirklich geleert werden?')) return;
+function doResetModel() {
     delete currentModel.painted;
     delete currentModel.complete;
     showPlayModel(currentModel); // Einfach neu laden
@@ -200,6 +198,15 @@ function resetModel() {
     var imgTag = document.querySelector('#model_' + currentModel._id + ' img');
     imgTag.setAttribute('src', currentModel.thumbnail);
     imgTag.classList.remove('complete');
+}
+
+// Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
+function resetModel() {
+    try {
+        nativeMessageChannel.postMessage('resetclicked'); // Nativen Part anfragen, der soll Confirm-Dialog zeigen
+    } catch (err) {
+        if (confirm('Soll das Modell wirklich geleert werden?')) doResetModel();
+    }
 }
 
 // Erzeugt ein Material mit einer Farbe (wenn als Hex gegeben) oder einer Bildtexture (wenn URL angegeben)
