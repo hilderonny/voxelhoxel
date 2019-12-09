@@ -5,6 +5,8 @@ button:focus { outline: 0; }
 
 body { position: relative; }
 
+body.hideheader > .page > .header { display: none !important; }
+
 .page {
     display: flex;
     flex-direction: column;
