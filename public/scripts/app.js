@@ -82,8 +82,10 @@ function showPlayModel(model) {
     currentModel = model;
     // Wenn hier von außen ein Message handler definiert wurde, diesen aufrufen
     // Der kümmert sich dann um eventuelle Werbung und ruft danach von sich aus showCurrentModel() auf.
+    // newmodelclicked: Ungemaltes Modell wird angeklickt und es soll Werbung angezeigt werden
+    // oldmodelclicked: Bereits angefangenes Modell wird angeklickt und kann ohne Werbung angesehen werden.
     try {
-        nativeMessageChannel.postMessage('modelclicked');
+        nativeMessageChannel.postMessage((!model.painted || Object.keys(model.painted).length < 1) ? 'newmodelclicked' : 'oldmodelclicked');
     } catch (err) {
         showCurrentModel();
     }

@@ -8,7 +8,7 @@
 // Dieser Name ist ein Hilfsmittel, das beim Löschen des alten und Neuaufbau des neuen Caches hilft.
 // Wenn dieser Name geändert wird und der Service worker neu installiert wird. führt das bei activate()
 // dazu, dass der alte Cache gelöscht und bei fetch() dazu, dass alle zu cachenden Dateien neu geladen werden.
-var CACHE_NAME = 'voxelhoxel-3';
+var CACHE_NAME = 'voxelhoxel-4';
 
 // Diese Funktion wird bei der Neuinstallation des Service workers aufgerufen.
 self.addEventListener('install', function(evt) {
