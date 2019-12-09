@@ -163,6 +163,10 @@ function setupColorBar(model) {
 
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
 async function goBack() {
+    // Native Anwendung benachrichtigen
+    try {
+        nativeMessageChannel.postMessage('backclicked');
+    } catch (err) { }
     // Speichern nur, wenn bereits gemalt wurde
     if (currentModel.painted) {
         // Thumbnail erstellen
