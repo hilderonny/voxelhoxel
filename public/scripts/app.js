@@ -67,8 +67,8 @@ function addModelToList(model) {
 
 function showCurrentModel() {
     // Farbpalette erstellen, muss vor dem Modell erstellen geschehen, um die bereits gemalten Farben zu erkennen
-    setupColorBar(model);
-    Player.loadModel(model);
+    setupColorBar(currentModel);
+    Player.loadModel(currentModel);
     // Erste Farbe selektieren
     document.querySelector('#playpage .content .colorbar input').click();
     UTILS.showElement('#playpage');
