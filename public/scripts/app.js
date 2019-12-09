@@ -82,12 +82,11 @@ function showPlayModel(model) {
     currentModel = model;
     // Wenn hier von außen ein Message handler definiert wurde, diesen aufrufen
     // Der kümmert sich dann um eventuelle Werbung und ruft danach von sich aus showCurrentModel() auf.
-    if (nativeMessageChannel && nativeMessageChannel.postMessage) {
-        try { nativeMessageChannel.postMessage('modelclicked'); } catch (err) {}
-    } else {
+    try {
+        nativeMessageChannel.postMessage('modelclicked');
+    } catch (err) {
         showCurrentModel();
     }
-
 }
 
 // Füllt die Farbpalette mit den gegebenen Farben und Texturen
