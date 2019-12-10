@@ -2,6 +2,18 @@ window.addEventListener('load', function () {
 
     var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
 
+    function getNativeMessageChannel() {
+        var channel = undefined;
+        try {
+            channel = nativeMessageChannel;
+        } catch (err) { }
+        return channel;
+    }
+
+    if (getNativeMessageChannel()) {
+        document.body.classList.add('hasnativemessagechannel'); // Hiermit werden bei neuen Modellen auch Werbehinweise angezeigt
+    }
+
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     // Das wird bewusst mit then() ausgeführt, damit weiter unten während des Ladens die Liste bereits angezeigt werden kann
     LocalDb.listModels().then(async function (localModels) {
@@ -84,9 +96,10 @@ function showPlayModel(model) {
     // Der kümmert sich dann um eventuelle Werbung und ruft danach von sich aus showCurrentModel() auf.
     // newmodelclicked: Ungemaltes Modell wird angeklickt und es soll Werbung angezeigt werden
     // oldmodelclicked: Bereits angefangenes Modell wird angeklickt und kann ohne Werbung angesehen werden.
-    try {
-        nativeMessageChannel.postMessage((!model.painted || Object.keys(model.painted).length < 1) ? 'newmodelclicked' : 'oldmodelclicked');
-    } catch (err) {
+    var channel = getNativeMessageChannel();
+    if (channel) {
+        channel.postMessage((!model.painted || Object.keys(model.painted).length < 1) ? 'newmodelclicked' : 'oldmodelclicked');
+    } else {
         showCurrentModel();
     }
 }
@@ -166,9 +179,8 @@ function setupColorBar(model) {
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
 async function goBack() {
     // Native Anwendung benachrichtigen
-    try {
-        nativeMessageChannel.postMessage('backclicked');
-    } catch (err) { }
+    var channel = getNativeMessageChannel();
+    if (channel) channel.postMessage('backclicked');
     // Speichern nur, wenn bereits gemalt wurde
     if (currentModel.painted) {
         // Thumbnail erstellen
@@ -202,9 +214,9 @@ function doResetModel() {
 
 // Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
 function resetModel() {
-    try {
-        nativeMessageChannel.postMessage('resetclicked'); // Nativen Part anfragen, der soll Confirm-Dialog zeigen
-    } catch (err) {
+    if (channel) {
+        channel.postMessage('resetclicked'); // Nativen Part anfragen, der soll Confirm-Dialog zeigen
+    } else {
         if (confirm('Soll das Modell wirklich geleert werden?')) doResetModel();
     }
 }

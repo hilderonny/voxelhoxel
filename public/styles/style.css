@@ -245,6 +245,7 @@ body.hideheader > .page > .header { display: none !important; }
 #listpage .grid > li > img.complete~span.complete {display: block; }
 #listpage .grid > li > img.new { filter:grayscale(100%); }
 #listpage .grid > li > img.new~span.new {display: block; }
+body.hasnativemessagechannel #listpage .grid > li::before { content: "🎞"; position: absolute;top: 0;right: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 
 /***** Spieleseite *****/
 
