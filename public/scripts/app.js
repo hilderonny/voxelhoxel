@@ -2,14 +2,6 @@ window.addEventListener('load', function () {
 
     var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
 
-    function getNativeMessageChannel() {
-        var channel = undefined;
-        try {
-            channel = nativeMessageChannel;
-        } catch (err) { }
-        return channel;
-    }
-
     if (getNativeMessageChannel()) {
         document.body.classList.add('hasnativemessagechannel'); // Hiermit werden bei neuen Modellen auch Werbehinweise angezeigt
     }
@@ -254,4 +246,12 @@ function createNumberMaterial(number) {
     const texture = new THREE.Texture(bitmap);
     texture.needsUpdate = true;
     return new THREE.MeshLambertMaterial({ map: texture });
+}
+
+function getNativeMessageChannel() {
+    var channel = undefined;
+    try {
+        channel = nativeMessageChannel;
+    } catch (err) { }
+    return channel;
 }
