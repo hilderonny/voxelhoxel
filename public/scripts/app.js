@@ -207,6 +207,7 @@ function doResetModel() {
 
 // Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
 function resetModel() {
+    var channel = getNativeMessageChannel();
     if (channel) {
         channel.postMessage('resetclicked'); // Nativen Part anfragen, der soll Confirm-Dialog zeigen
     } else {
