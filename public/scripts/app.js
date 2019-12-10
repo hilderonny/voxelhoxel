@@ -68,7 +68,8 @@ function addModelToList(model) {
     var list = document.querySelector('#listpage .grid');
     var el = document.createElement('li');
     el.setAttribute('id', 'model_' + model._id);
-    el.innerHTML = '<img src="' + model.thumbnail + '" class="' + ((!model.painted || Object.keys(model.painted).length < 1) ? 'new' : '') + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
+    if ((!model.painted || Object.keys(model.painted).length < 1)) el.classList.add('new');
+    el.innerHTML = '<img src="' + model.thumbnail + '" class="' + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
     el.addEventListener('click', function () {
         el.classList.add('progressspinner');
         showPlayModel(model);
