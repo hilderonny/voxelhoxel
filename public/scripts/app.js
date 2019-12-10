@@ -1,6 +1,6 @@
 window.addEventListener('load', function () {
 
-    var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
+    var currentModel, currentEl; // Merken, um beim Zurück gehen dieses zu speichern
 
     if (getNativeMessageChannel()) {
         document.body.classList.add('hasnativemessagechannel'); // Hiermit werden bei neuen Modellen auch Werbehinweise angezeigt
@@ -63,14 +63,15 @@ function addModelToList(model) {
     if ((!model.painted || Object.keys(model.painted).length < 1)) el.classList.add('new');
     el.innerHTML = '<img src="' + model.thumbnail + '" class="' + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
     el.addEventListener('click', function () {
+        currentEl = el;
         el.classList.add('progressspinner');
         showPlayModel(model);
-        el.classList.remove('progressspinner');
     });
     list.appendChild(el);
 }
 
 function showCurrentModel() {
+    currentEl.classList.remove('progressspinner');
     // Farbpalette erstellen, muss vor dem Modell erstellen geschehen, um die bereits gemalten Farben zu erkennen
     setupColorBar(currentModel);
     Player.loadModel(currentModel);
