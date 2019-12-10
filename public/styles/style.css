@@ -232,7 +232,7 @@ body.hideheader > .page > .header { display: none !important; }
 body.hasnativemessagechannel #listpage .grid > li.new::after { content: "🎞"; position: absolute;top: 0;left: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 
 /* Muss hier sein, damit li.new überschrieben wird */
-#listpage .grid > li.progressspinner::after {
+.progressspinner::after, body.hasnativemessagechannel #listpage .grid > li.progressspinner::after {
     content: "";
     position: absolute;
     width: 48px;
