@@ -90,22 +90,6 @@ body.hideheader > .page > .header { display: none !important; }
     z-index: 1;
 }
 
-.progressspinner::after {
-    content: "";
-    position: absolute;
-    width: 48px;
-    height: 48px;
-    top: 50%;
-    left: 50%;
-    border: 4px solid;
-    border-radius: 30px;
-    border-top-color: transparent;
-    border-bottom-color: transparent;
-    animation: progressspinner 1.2s linear infinite;
-    z-index: 2;
-    border-color: #88bbff transparent;
-}
-
 .grid {
     padding: 8px;
     text-align: center;
@@ -246,6 +230,23 @@ body.hideheader > .page > .header { display: none !important; }
 #listpage .grid > li.new > img { filter:grayscale(100%); }
 #listpage .grid > li.new > span.new {display: block; }
 body.hasnativemessagechannel #listpage .grid > li.new::after { content: "🎞"; position: absolute;top: 0;left: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+
+/* Muss hier sein, damit li.new überschrieben wird */
+.progressspinner::after {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    left: 50%;
+    border: 4px solid;
+    border-radius: 30px;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    animation: progressspinner 1.2s linear infinite;
+    z-index: 2;
+    border-color: #88bbff transparent;
+}
 
 /***** Spieleseite *****/
 
