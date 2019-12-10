@@ -43,6 +43,9 @@ window.addEventListener('load', function () {
                 addModelToList(localModel);
             });
             UTILS.hideElement('.progressbar');
+            // Native app benachrichtigen
+            var channel = getNativeMessageChannel();
+            if (channel) channel.postMessage('pageloaded');
         });
     });
 
