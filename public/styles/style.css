@@ -232,7 +232,7 @@ body.hideheader > .page > .header { display: none !important; }
 body.hasnativemessagechannel #listpage .grid > li.new::after { content: "🎞"; position: absolute;top: 0;left: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 
 /* Muss hier sein, damit li.new überschrieben wird */
-.progressspinner::after {
+#listpage .grid > li.progressspinner::after {
     content: "";
     position: absolute;
     width: 48px;
@@ -246,6 +246,7 @@ body.hasnativemessagechannel #listpage .grid > li.new::after { content: "🎞"; 
     animation: progressspinner 1.2s linear infinite;
     z-index: 2;
     border-color: #88bbff transparent;
+    background-color: unset;
 }
 
 /***** Spieleseite *****/
