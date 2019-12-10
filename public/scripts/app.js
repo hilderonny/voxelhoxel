@@ -2,10 +2,6 @@ window.addEventListener('load', function () {
 
     var currentModel, currentEl; // Merken, um beim Zurück gehen dieses zu speichern
 
-    if (getNativeMessageChannel()) {
-        document.body.classList.add('hasnativemessagechannel'); // Hiermit werden bei neuen Modellen auch Werbehinweise angezeigt
-    }
-
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     // Das wird bewusst mit then() ausgeführt, damit weiter unten während des Ladens die Liste bereits angezeigt werden kann
     LocalDb.listModels().then(async function (localModels) {
