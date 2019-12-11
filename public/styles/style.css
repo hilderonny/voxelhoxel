@@ -230,7 +230,7 @@ body.hideheader > .page > .header { display: none !important; }
 #listpage .grid > li.new > img { filter:grayscale(100%); }
 #listpage .grid > li.new > span.new {display: block; }
 /* hasads wird von nativen Wrappern gesetzt, um Werbung zu markieren */
-body.hasads #listpage .grid > li.new::after { content: "🎞"; position: absolute;top: 0;left: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 4px 0;text-transform: uppercase;font-weight: bold;font-size: 18px;}
+body.hasads #listpage .grid > li.new::after { content: "Werbung"; position: absolute;bottom: 0;left: 0;color: #fff;background-color: #0be;padding: 4px;border-radius: 0 4px;text-transform: uppercase;font-weight: bold;font-size: 18px;}
 
 /* Muss hier sein, damit li.new überschrieben wird */
 .progressspinner::after, body.hasads #listpage .grid > li.progressspinner::after {
