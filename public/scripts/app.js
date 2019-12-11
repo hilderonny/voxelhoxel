@@ -40,9 +40,9 @@ window.addEventListener('load', function () {
             addModelToList(localModel);
         });
         UTILS.hideElement('.progressbar');
-        // Native app benachrichtigen
-        var channel = getNativeMessageChannel();
-        if (channel) channel.postMessage('pageloaded');
+        // Gucken, ob native App Werbung enthält
+        var jsi = getJSInterface();
+        if (jsi && jsi.hasAds()) document.body.classList.add('hasads');
         // Player initialisieren. Der wird in allen Modellansichten wiederverwendet
         Player.init(document.querySelector('#playpage .canvas'));
     });
@@ -99,16 +99,12 @@ function showCurrentModel() {
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
 function showPlayModel(model) {
     currentModel = model;
-    // Wenn hier von außen ein Message handler definiert wurde, diesen aufrufen
-    // Der kümmert sich dann um eventuelle Werbung und ruft danach von sich aus showCurrentModel() auf.
-    // newmodelclicked: Ungemaltes Modell wird angeklickt und es soll Werbung angezeigt werden
-    // oldmodelclicked: Bereits angefangenes Modell wird angeklickt und kann ohne Werbung angesehen werden.
-    var channel = getNativeMessageChannel();
-    if (channel) {
-        channel.postMessage((!model.painted || Object.keys(model.painted).length < 1) ? 'newmodelclicked' : 'oldmodelclicked');
-    } else {
-        showCurrentModel();
+    // Native Anwendung Werbung anzeigen lassen. Im Hintergrund wird das Modell gleich geöffnet.
+    if(!model.painted || Object.keys(model.painted).length < 1) {
+        var jsi = getJSInterface();
+        if (jsi) jsi.showFullscreenAd();
     }
+    showCurrentModel();
 }
 
 // Füllt die Farbpalette mit den gegebenen Farben und Texturen
@@ -186,9 +182,6 @@ function setupColorBar(model) {
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
 function goBack() {
     return (function() {
-        // Native Anwendung benachrichtigen
-        var channel = getNativeMessageChannel();
-        if (channel) channel.postMessage('backclicked');
         // Speichern nur, wenn bereits gemalt wurde
         if (currentModel.painted) {
             // Thumbnail erstellen
@@ -229,9 +222,9 @@ function doResetModel() {
 
 // Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
 function resetModel() {
-    var channel = getNativeMessageChannel();
-    if (channel) {
-        channel.postMessage('resetclicked'); // Nativen Part anfragen, der soll Confirm-Dialog zeigen
+    var jsi = getJSInterface();
+    if (jsi) {
+        jsi.askForModelReset();
     } else {
         if (confirm('Soll das Modell wirklich geleert werden?')) doResetModel();
     }
@@ -271,10 +264,10 @@ function createNumberMaterial(number) {
     return new THREE.MeshLambertMaterial({ map: texture });
 }
 
-function getNativeMessageChannel() {
-    var channel = undefined;
+function getJSInterface() {
+    var iface = undefined;
     try {
-        channel = nativeMessageChannel;
+        iface = JSInterface;
     } catch (err) { }
-    return channel;
+    return iface;
 }
