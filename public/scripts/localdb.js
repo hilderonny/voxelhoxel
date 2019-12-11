@@ -36,63 +36,39 @@ const LocalDb = (function() {
   // Legt LocalDb als Singleton-Klasse im globalen Kontext an.
   return {
     
-    // Löscht ein Modell mit der angegebenen Id.
-    deleteModel: function(_id) {
-      return new Promise(async function(resolve, reject) {
-        const db = await getDb();
-        const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).delete(_id);
-        request.onerror = function() {
-          reject(request);
-        };
-        request.onsuccess = function() {
-          resolve(request);
-        };
-      });
-    },
-    
     // Listet alle lokal gespciehrten Modelle auf. Feld kann leer sein.
     // Wird für Übersicht verwendet.
     listModels: function() {
-      return new Promise(async function(resolve) {
-        const db = await getDb();
-        const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).openCursor();
-        const models = [];
-        request.onsuccess = function(event) {
-          var cursor = event.target.result;
-          if (cursor) {
-            models.push(cursor.value);
-            cursor.continue();
-          } else {
-            resolve(models);
-          }
-        };
-      });
-    },
-    
-    // Lädt ein bestimmtes Modell mit all seinen Daten aus der Datenbank
-    // Wird für Editor verwendet.
-    loadModel: function(_id) {
-      return new Promise(async function(resolve) {
-        const db = await getDb();
-        const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).get(_id);
-        request.onsuccess = function() {
-          resolve(request.result);
-        };
+      return getDb().then(function(db) {
+        return new Promise(function(resolve) {
+          var request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).openCursor();
+          const models = [];
+          request.onsuccess = function(event) {
+            var cursor = event.target.result;
+            if (cursor) {
+              models.push(cursor.value);
+              cursor.continue();
+            } else {
+              resolve(models);
+            }
+          };
+        });
       });
     },
     
     // Speichert ein Modell, welches vorher mit loadModel geladen wurde, in die Datenbank.
     // Überschreibt ein bestehendes Modell mit derselben Id komplett.
     saveModel: function(model) {
-      return new Promise(async function(resolve, reject) {
-        const db = await getDb();
-        const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).put(model);
-        request.onerror = function() {
-          reject(request);
-        };
-        request.onsuccess = function() {
-          resolve(request.result);
-        };
+      return getDb().then(function(db) {
+        return new Promise(function(resolve, reject) {
+          const request = db.transaction([modelCollection], 'readwrite').objectStore(modelCollection).put(model);
+          request.onerror = function() {
+            reject(request);
+          };
+          request.onsuccess = function() {
+            resolve(request.result);
+          };
+        });
       });
     },
     

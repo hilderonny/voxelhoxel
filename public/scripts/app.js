@@ -1,70 +1,84 @@
+var currentModel, currentEl, localModels;
+
 window.addEventListener('load', function () {
-
-    var currentModel, currentEl; // Merken, um beim Zurück gehen dieses zu speichern
-
     // Lokale Modelle aus der IndexedDb laden und anzeigen
     // Das wird bewusst mit then() ausgeführt, damit weiter unten während des Ladens die Liste bereits angezeigt werden kann
-    LocalDb.listModels().then(async function (localModels) {
+    return LocalDb.listModels().then(function (models) {
+        localModels = models;
         // Anschließend Modelle vom Server laden und dabei den Ladespinner anzeigen
         UTILS.showElement('.progressbar');
         // Erst mal die Metadaten holen, dabei nur veröffentlichte beachten. Id und Zeitpunkt der letzten Änderung
-        fetch('api/modelinfos/published', { cache: 'reload'}).then(async function(modelsresponse) {
-            var modelmetas = await modelsresponse.json();
-            // Diese Methode ist nach dem async/await Schema, weil wir nach den ganzen asynchronen Aufrufen
-            // aller Modelle den Ladespinner wieder ausmachen müssen.
-            for (var i = 0; i < modelmetas.length; i++) {
-                var modelmeta = modelmetas[i];
-                // Modelle, die noch nicht veröffentlicht sind, sollen auch nicht angezeigt werden
-                if (!modelmeta.published) continue;
-                // Prüfen, ob das Modell bereits lokal vorhanden ist
-                var localModelIndex = localModels.findIndex(function (m) { return m._id === modelmeta.modelid });
-                if (localModelIndex >= 0) {
-                    var localModel = localModels[localModelIndex];
-                    // Wenn das lokale Modell genauso alt ist oder bereits daran gemalt wurde, soll das lokale genommen werden
-                    if ((localModel.painted && localModel.painted.length > 0) || (localModel.lastmodified >= modelmeta.lastmodified)) {
-                        continue;
-                    }
+        return fetch('api/modelinfos/published', { cache: 'reload' });
+    }).then(function (modelsresponse) {
+        return modelsresponse.json();
+    }).then(function (modelmetas) {
+        var promises = [];
+        for (var i = 0; i < modelmetas.length; i++) {
+            var modelmeta = modelmetas[i];
+            // Modelle, die noch nicht veröffentlicht sind, sollen auch nicht angezeigt werden
+            if (!modelmeta.published) continue;
+            // Prüfen, ob das Modell bereits lokal vorhanden ist
+            var localModelIndex = localModels.findIndex(function (m) { return m._id === modelmeta.modelid });
+            if (localModelIndex >= 0) {
+                var localModel = localModels[localModelIndex];
+                // Wenn das lokale Modell genauso alt ist oder bereits daran gemalt wurde, soll das lokale genommen werden
+                if ((localModel.painted && localModel.painted.length > 0) || (localModel.lastmodified >= modelmeta.lastmodified)) {
+                    continue;
                 }
-                // Hier gibt es entweder kein lokales Modell, oder es wurde noch nicht bearbeitet und auf dem Server gibt es ein Update.
-                // In diesem Falle soll es erneut vom Server geladen werden.
-                // Detaillierte Modellinfos vom Server laden
-                var modeldetailresponse = await fetch('/api/modeldetails/' + modelmeta.modelid, { cache: 'reload' });
-                var model = await modeldetailresponse.json();
-                // Das hier kommt aus der modelsinfos und steckt in den einzelnen Modelldateien nicht drin. Wird aber für Local Storage benötigt
-                model._id = modelmeta.modelid;
-                model.lastmodified = modelmeta.lastmodified;
-                // An dieser Stelle ist das Modell vom Server fertig geladen.
-                // Es ist noch nicht in der lokalen Datenbank, also speichern wir es dort rein.
-                await LocalDb.saveModel(model);
-                localModels.push(model);
             }
-            // Alle Modelle sortiert nach letztem Änderungsdatum anzeigen
-            localModels.sort(function(a, b) { return a.lastmodified < b.lastmodified ? 1 : -1; }).forEach(function(localModel) {
-                addModelToList(localModel);
-            });
-            UTILS.hideElement('.progressbar');
-            // Native app benachrichtigen
-            var channel = getNativeMessageChannel();
-            if (channel) channel.postMessage('pageloaded');
+            // Hier gibt es entweder kein lokales Modell, oder es wurde noch nicht bearbeitet und auf dem Server gibt es ein Update.
+            // In diesem Falle soll es erneut vom Server geladen werden.
+            promises.push(loadModelDetails(modelmeta).then(function (model) {
+                localModels.push(model);
+            }));
+        }
+        return Promise.all(promises);
+    }).then(function () {
+        // Alle Modelle sortiert nach letztem Änderungsdatum anzeigen
+        localModels.sort(function (a, b) { return a.lastmodified < b.lastmodified ? 1 : -1; }).forEach(function (localModel) {
+            addModelToList(localModel);
         });
+        UTILS.hideElement('.progressbar');
+        // Native app benachrichtigen
+        var channel = getNativeMessageChannel();
+        if (channel) channel.postMessage('pageloaded');
+        // Player initialisieren. Der wird in allen Modellansichten wiederverwendet
+        Player.init(document.querySelector('#playpage .canvas'));
     });
-
-    // Player initialisieren. Der wird in allen Modellansichten wiederverwendet
-    Player.init(document.querySelector('#playpage .canvas'));
-
 });
+
+// Lädt Modelldetails vom Server
+function loadModelDetails(modelmeta) {
+    var model;
+    // Detaillierte Modellinfos vom Server laden
+    return fetch('/api/modeldetails/' + modelmeta.modelid, { cache: 'reload' }).then(function (modeldetailresponse) {
+        return modeldetailresponse.json();
+    }).then(function (m) {
+        model = m;
+        // Das hier kommt aus der modelsinfos und steckt in den einzelnen Modelldateien nicht drin. Wird aber für Local Storage benötigt
+        model._id = modelmeta.modelid;
+        model.lastmodified = modelmeta.lastmodified;
+        model.modelmeta = modelmeta;
+        // An dieser Stelle ist das Modell vom Server fertig geladen.
+        // Es ist noch nicht in der lokalen Datenbank, also speichern wir es dort rein.
+        return LocalDb.saveModel(model);
+    }).then(function () {
+        return model;
+    });
+}
 
 // Fügt das Bild eines Modells in die Liste ein und verlinkt es mit der Detailansicht.
 function addModelToList(model) {
     var list = document.querySelector('#listpage .grid');
     var el = document.createElement('li');
     el.setAttribute('id', 'model_' + model._id);
-    if ((!model.painted || Object.keys(model.painted).length < 1)) el.classList.add('new');
+    if (model.lastmodified <= model.modelmeta.lastmodified && (!model.painted || Object.keys(model.painted).length < 1)) el.classList.add('new');
     el.innerHTML = '<img src="' + model.thumbnail + '" class="' + (model.complete ? ' complete' : '') + '"/><span class="new">Neu</span><span class="complete">&#10004;</span>';
+    el.model = model;
     el.addEventListener('click', function () {
         currentEl = el;
         el.classList.add('progressspinner');
-        showPlayModel(model);
+        showPlayModel(el.model); // Muss von hier genmommen werden, da es beim Reset aktualisiert wird
     });
     list.appendChild(el);
 }
@@ -82,7 +96,6 @@ function showCurrentModel() {
 }
 
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
-// Wird asynchron ausgeführt, weil das Laden eine Weile dauern kann
 function showPlayModel(model) {
     currentModel = model;
     // Wenn hier von außen ein Message handler definiert wurde, diesen aufrufen
@@ -106,9 +119,9 @@ function setupColorBar(model) {
     document.querySelector('#playpage .content > .complete').classList.add('invisible');
     // Farben zählen
     var colorsUsed = {};
-    Object.values(model.scene).forEach(function(z) {
-        Object.values(z).forEach(function(y) {
-            Object.values(y).forEach(function(paletteIndex) {
+    Object.values(model.scene).forEach(function (z) {
+        Object.values(z).forEach(function (y) {
+            Object.values(y).forEach(function (paletteIndex) {
                 colorsUsed[paletteIndex] = colorsUsed[paletteIndex] ? colorsUsed[paletteIndex] + 1 : 1;
             });
         });
@@ -116,11 +129,11 @@ function setupColorBar(model) {
     var colorbar = document.querySelector('#playpage .content .colorbar');
     colorbar.innerHTML = '';
     var labels = {};
-    model.colorpalette.forEach(function(colorOrUrl, index) {
+    model.colorpalette.forEach(function (colorOrUrl, index) {
         if (!colorsUsed[index]) return;
         var label = document.createElement('label');
         label.innerHTML = '<input type="radio" name="colorbarinput" value="' + index + '"/><span>' + (index + 1) + '</span>';
-        label.querySelector('input').addEventListener('change', function(evt) {
+        label.querySelector('input').addEventListener('change', function (evt) {
             var paletteIndex = parseInt(evt.target.value);
             Player.selectColor(paletteIndex);
             document.querySelector('#playpage .content > .colorcounter .number').innerHTML = colorsUsed[index];
@@ -141,9 +154,9 @@ function setupColorBar(model) {
         colorbar.appendChild(label);
         labels[index] = label;
     });
-    var colorCount = Object.values(colorsUsed).reduce(function(a, b) { return a + b; });
+    var colorCount = Object.values(colorsUsed).reduce(function (a, b) { return a + b; });
     // Event handler für ausgemalte Boxen zum runterzählen
-    Player.onBoxPainted = function(box) {
+    Player.onBoxPainted = function (box) {
         // Modell aktualisieren
         var userData = box.userData;
         var x = userData.x;
@@ -170,39 +183,47 @@ function setupColorBar(model) {
 }
 
 // Wenn auf den Backbutton gedrückt wurde, woll das Modell lokal gespeichert und danach die Liste angezeigt werden
-async function goBack() {
-    // Native Anwendung benachrichtigen
-    var channel = getNativeMessageChannel();
-    if (channel) channel.postMessage('backclicked');
-    // Speichern nur, wenn bereits gemalt wurde
-    if (currentModel.painted) {
-        // Thumbnail erstellen
-        currentModel.thumbnail = Player.makeScreenshot();
-        // Letzte Änderung
-        currentModel.lastmodified = Date.now();
-        // Modell lokal speichern
-        await LocalDb.saveModel(currentModel);
-        // Thumbnail auf Liste aktualisieren
-        var imgTag = document.querySelector('#model_' + currentModel._id + ' img');
-        imgTag.setAttribute('src', currentModel.thumbnail);
-        imgTag.classList.remove('new'); // Gemalt ist halt nicht neu
-        // Vervollständigung in Liste anzeigen
-        if (currentModel.complete) imgTag.classList.add('complete');
-    }
-    // Spieleseite verbergen
-    currentModel = undefined;
-    UTILS.hideElement('#playpage');
+function goBack() {
+    return (function() {
+        // Native Anwendung benachrichtigen
+        var channel = getNativeMessageChannel();
+        if (channel) channel.postMessage('backclicked');
+        // Speichern nur, wenn bereits gemalt wurde
+        if (currentModel.painted) {
+            // Thumbnail erstellen
+            currentModel.thumbnail = Player.makeScreenshot();
+            // Letzte Änderung
+            currentModel.lastmodified = Date.now();
+            // Modell lokal speichern
+            return LocalDb.saveModel(currentModel).then(function () {
+                // Thumbnail auf Liste aktualisieren
+                var listtag = document.querySelector('#model_' + currentModel._id);
+                var imagetag = listtag.querySelector('img');
+                imagetag.setAttribute('src', currentModel.thumbnail);
+                listtag.classList.remove('new'); // Gemalt ist halt nicht neu
+                // Vervollständigung in Liste anzeigen
+                if (currentModel.complete) listtag.classList.add('complete');
+            });
+        }
+        return Promise.resolve();
+    })().then(function () {
+        // Spieleseite verbergen
+        currentModel = undefined;
+        UTILS.hideElement('#playpage');
+    });
 }
 
 function doResetModel() {
-    delete currentModel.painted;
-    delete currentModel.complete;
-    showPlayModel(currentModel); // Einfach neu laden
-    // Thumbnail auf Liste aktualisieren
-    currentModel.thumbnail = Player.makeScreenshot();
-    var imgTag = document.querySelector('#model_' + currentModel._id + ' img');
-    imgTag.setAttribute('src', currentModel.thumbnail);
-    imgTag.classList.remove('complete');
+    return loadModelDetails(currentModel.modelmeta).then(function(model) {
+        localModels.splice(localModels.findIndex(function(m) { return m._id === model._id; }), 1, model);
+        var listtag = document.querySelector('#model_' + model._id);
+        listtag.classList.add('new');
+        listtag.model = model; // Für das Listenklicken wichtig, damit nicht das alte Modell genommen wird
+        var imagetag = listtag.querySelector('img');
+        imagetag.setAttribute('src', model.thumbnail);
+        listtag.classList.remove('complete');
+        showPlayModel(model); // Einfach neu laden
+    });
 }
 
 // Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
@@ -223,9 +244,9 @@ function createStandardMaterial(hexColorOrUrl) {
         var texture = new THREE.TextureLoader().load(hexColorOrUrl);
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.LinearMipMapLinearFilter;
-        return new THREE.MeshLambertMaterial( { map: texture } );
+        return new THREE.MeshLambertMaterial({ map: texture });
     } else {
-        return new THREE.MeshLambertMaterial( { color: hexColorOrUrl } );
+        return new THREE.MeshLambertMaterial({ color: hexColorOrUrl });
     }
 }
 

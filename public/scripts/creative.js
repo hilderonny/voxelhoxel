@@ -1,6 +1,15 @@
 var currentModel; // Merken, um beim Zurück gehen dieses zu speichern
 var allModels = []; // Liste aller Modelle
 
+/**
+ * ACHTUNG!
+ * Hier wird async/await benutzt. Das funktioniert aber nur im Chrome Browser direkt!
+ * Wenn also irgendwann mal eine native Anwendung mit einer WebView den Kreativmodus benutzen soll,
+ * muss das wieder auf Promises umgestellt werden. Auf älteren Tablet können die WebViews
+ * nämlich kein async/await, obwohl dort vielleicht schon der Chrome Browser drauf ist
+ * (dieser verwendet seine eigene WebView Implementierung).
+ */
+
 // Kreativmodus
 // Dieser funktioniert derzeit nur mit Netzverbindung ohne lokalen Speicher
 window.addEventListener('load', function () {

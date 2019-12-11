@@ -8,10 +8,10 @@
 // Dieser Name ist ein Hilfsmittel, das beim Löschen des alten und Neuaufbau des neuen Caches hilft.
 // Wenn dieser Name geändert wird und der Service worker neu installiert wird. führt das bei activate()
 // dazu, dass der alte Cache gelöscht und bei fetch() dazu, dass alle zu cachenden Dateien neu geladen werden.
-var CACHE_NAME = 'voxelhoxel-9';
+var CACHE_NAME = 'voxelhoxel-10';
 
 // Diese Funktion wird bei der Neuinstallation des Service workers aufgerufen.
-self.addEventListener('install', function(evt) {
+self.addEventListener('install', function (evt) {
     console.log('%c⚙ install: Neuinstallation nach Änderung der Service worker Datei', 'color:lightgrey');
     // skipWaiting dient dazu, dass die vorherige Version des workers beendet und diese neue
     // Version gleich installiert und aktiviert wird, ohne zu warten
@@ -38,24 +38,24 @@ self.addEventListener('activate', function (evt) {
 
 // Netzwerkabfragen abfangen und im Offline Betrieb aus Cache bereit stellen
 self.addEventListener('fetch', function (evt) {
+    var cachetouse;
     evt.respondWith(
-        caches.open(CACHE_NAME).then(async function (cache) {
-            try {
-                // Versuchen, die Datei aus dem Netz zu laden. 'reload' umgeht dabei den Browser-eigenen Cache, damit die Dateien
-                // zwangsweise neu geladen werden. Ist bei js-Dateien ganz hilfreich, weil der Browser diese sonst nicht neu lädt
-                var response = await fetch(evt.request, {cache: 'reload'});
-                // Wenn der Zugriff auf das Netz geklappt hat, die Datei im Cache speichern
-                if (response.status === 200) {
-                    console.log('%c⚙ fetch: Speichere im Cache: ' + evt.request.url, 'color:lightgrey');
-                    cache.put(evt.request.url, response.clone());
-                }
-                return response;
+        caches.open(CACHE_NAME).then(function (cache) {
+            cachetouse = cache;
+            // Versuchen, die Datei aus dem Netz zu laden. 'reload' umgeht dabei den Browser-eigenen Cache, damit die Dateien
+            // zwangsweise neu geladen werden. Ist bei js-Dateien ganz hilfreich, weil der Browser diese sonst nicht neu lädt
+            return fetch(evt.request, { cache: 'reload' });
+        }).then(function (response) {
+            // Wenn der Zugriff auf das Netz geklappt hat, die Datei im Cache speichern
+            if (response.status === 200) {
+                console.log('%c⚙ fetch: Speichere im Cache: ' + evt.request.url, 'color:lightgrey');
+                cachetouse.put(evt.request.url, response.clone());
             }
-            catch (err) {
-                // Netzwerkzugriff fehlgeschlagen, also aus dem Cache holen
-                console.log('%c⚙ fetch: Liefere aus dem Cache: ' + evt.request.url, 'color:lightgrey');
-                return cache.match(evt.request);
-            }
+            return response;
+        }, function () {
+            // Netzwerkzugriff fehlgeschlagen, also aus dem Cache holen
+            console.log('%c⚙ fetch: Liefere aus dem Cache: ' + evt.request.url, 'color:lightgrey');
+            return cachetouse.match(evt.request);
         })
     );
 });
