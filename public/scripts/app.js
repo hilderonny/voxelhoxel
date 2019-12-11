@@ -21,6 +21,7 @@ window.addEventListener('load', function () {
             var localModelIndex = localModels.findIndex(function (m) { return m._id === modelmeta.modelid });
             if (localModelIndex >= 0) {
                 var localModel = localModels[localModelIndex];
+                localModel.modelmeta = modelmeta; // Muss sein für vorhergehende Versionen
                 // Wenn das lokale Modell genauso alt ist oder bereits daran gemalt wurde, soll das lokale genommen werden
                 if ((localModel.painted && localModel.painted.length > 0) || (localModel.lastmodified >= modelmeta.lastmodified)) {
                     continue;
