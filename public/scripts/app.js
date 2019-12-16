@@ -40,9 +40,6 @@ window.addEventListener('load', function () {
             addModelToList(localModel);
         });
         UTILS.hideElement('.progressbar');
-        // Gucken, ob native App Werbung enthält
-        var jsi = getJSInterface();
-        if (jsi && jsi.hasAds()) document.body.classList.add('hasads');
         // Player initialisieren. Der wird in allen Modellansichten wiederverwendet
         Player.init(document.querySelector('#playpage .canvas'));
     });
@@ -99,11 +96,6 @@ function showCurrentModel() {
 // Lädt ein Modell in den Spielemodus und zeigt die Spielseite an
 function showPlayModel(model) {
     currentModel = model;
-    // Native Anwendung Werbung anzeigen lassen. Im Hintergrund wird das Modell gleich geöffnet.
-    if(!model.painted || Object.keys(model.painted).length < 1) {
-        var jsi = getJSInterface();
-        if (jsi) jsi.showFullscreenAd();
-    }
     showCurrentModel();
 }
 
@@ -222,12 +214,7 @@ function doResetModel() {
 
 // Leert das Modell indem alle gemalten Teile vergessen und das Modell neu geladen wird.
 function resetModel() {
-    var jsi = getJSInterface();
-    if (jsi) {
-        jsi.askForModelReset();
-    } else {
-        if (confirm('Soll das Modell wirklich geleert werden?')) doResetModel();
-    }
+    if (confirm('Soll das Modell wirklich geleert werden?')) doResetModel();
 }
 
 // Erzeugt ein Material mit einer Farbe (wenn als Hex gegeben) oder einer Bildtexture (wenn URL angegeben)
@@ -262,12 +249,4 @@ function createNumberMaterial(number) {
     const texture = new THREE.Texture(bitmap);
     texture.needsUpdate = true;
     return new THREE.MeshLambertMaterial({ map: texture });
-}
-
-function getJSInterface() {
-    var iface = undefined;
-    try {
-        iface = JSInterface;
-    } catch (err) { }
-    return iface;
 }
