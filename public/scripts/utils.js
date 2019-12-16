@@ -41,9 +41,18 @@ var UTILS = {
 // Service worker einbinden. Dieser muss im Stammverzeichnis der App in der Datei "serviceworker.js"
 // enthalten sein.
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
+    window.addEventListener('load', async function() {
         var serviceWorkerFile = 'serviceworker.js';
         console.log('%c🧰 load: Registriere service worker aus Datei ' + serviceWorkerFile, 'color:yellow');
-        navigator.serviceWorker.register(serviceWorkerFile);
+        serviceworkerregistration = await navigator.serviceWorker.register(serviceWorkerFile);
+        // Bei Aktualisierung des serviceworkers soll die Seite gleich neu geladen werden, um neue Daten anzuzeigen
+        serviceworkerregistration.onupdatefound = function () {
+            const installingWorker = serviceworkerregistration.installing;
+            installingWorker.onstatechange = function () {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    location.reload(); // Neu laden, wenn Service worker aktualisiert wurde
+                }
+            };
+        };
     });
 }
